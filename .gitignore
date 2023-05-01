@@ -28,7 +28,7 @@ yarn-error.log*
 /test-flow.spec
 __pycache__
 
-package-lock.json
+
 yarn.lock
 Pipfile
 Pipfile.lock
