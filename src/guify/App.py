@@ -12,7 +12,8 @@ worker = TestWorker()
 
 
 class GUIfy:
-    def __init__(self, app_name='GUIfy'):
+    def __init__(self, app_name='GUIfy', port=8080):
+        self._port = port
         self.app_name = app_name
         self.worker = worker
         self.monitor = worker.monitor
@@ -38,36 +39,38 @@ class GUIfy:
         if debug:
             directory = 'src\\guify\\web'
             app = None
-            page = 'index.html'
+            port=3001
+            page = {port:3000}
             app_mode = False
         else:
             directory = os.path.join(os.path.dirname(
                 os.path.abspath(__file__)), 'web')
             app = 'chrome'
+            port=self._port
             page = 'index.html'
             app_mode = True
 
         eel.init(directory, ['.tsx', '.ts', '.jsx', '.js', '.html'])
         eel_kwargs = dict(
             host='localhost',
-            port=8080,
             size=(1280, 800),
             app_mode=app_mode,
         )
         try:
-            eel.start(page, mode=app, **eel_kwargs)
+            print(port)
+            eel.start(page, mode=app, port=port, **eel_kwargs)
         except EnvironmentError as env:
             if "[WinError 10048]" in str(env):
                 alert(
                     f"ERROR!: Another program is using port 8080. Please close it and try again.\n\n{str(env)}",
                     title="IO ERROR!")
                 raise
-
-            # If Chrome isn't found, fallback to Microsoft Edge on Win10 or greater
-            if sys.platform in ['win32', 'win64'] and int(platform.release()) >= 10:
-                eel.start(page, mode='edge', **eel_kwargs)
             else:
-                raise
+                # If Chrome isn't found, fallback to Microsoft Edge on Win10 or greater
+                if sys.platform in ['win32', 'win64'] and int(platform.release()) >= 10:
+                    eel.start(page, mode='edge', **eel_kwargs)
+                else:
+                    raise
 
         if debug:
             logging.basicConfig(level=logging.DEBUG)
