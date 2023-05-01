@@ -83,11 +83,6 @@ def all_params():
     return {"params": all_params}
 
 @eel.expose
-def app_name():
-    log.debug(f"app_name called")
-    return "test"
-
-@eel.expose
 def answer_prompt(response):
     log.debug(f"answer_prompt called with response: {response}")
     if response not in [OK, CANCEL]:

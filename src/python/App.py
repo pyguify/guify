@@ -32,6 +32,10 @@ class GUIfy:
 
     # _eel_kwargs is solely for development and testing purposes
     def run(self, _eel_kwargs: dict = None):
+        @eel.expose
+        def app_name():
+            log.debug(f"app_name called")
+            return "test"
         log.debug("Starting GUIfy")
         
         directory = _eel_kwargs.get('directory', os.path.join(os.path.dirname(
