@@ -12,7 +12,7 @@
   "scripts": {
     "start:js": "react-scripts start",
     "build:js": "react-scripts build && node postbuild.js",
-    "start:guify": "py test.py dev",
+    "start:guify": "py run_debug.py dev",
     "build:guify": "py -m build",
     "clean:build": "rm -rf dist",
     "start": "npm-run-all -p start:*",
