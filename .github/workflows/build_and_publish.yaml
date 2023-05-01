@@ -32,7 +32,9 @@ jobs:
 
       # Build
       - name: Build react app and guify
-        run: npm run build
+        run: |
+          npm run build:js
+          python -m build
 
       # Publish
       - name: Publish to PyPI
