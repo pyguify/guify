@@ -12,7 +12,8 @@ worker = TestWorker()
 
 
 class GUIfy:
-    def __init__(self, app_name='GUIfy'):
+    def __init__(self, app_name='GUIfy', port=8080):
+        self._port = port
         self.app_name = app_name
         self.worker = worker
         self.monitor = worker.monitor
@@ -50,7 +51,7 @@ class GUIfy:
         eel.init(directory, ['.tsx', '.ts', '.jsx', '.js', '.html'])
         eel_kwargs = dict(
             host='localhost',
-            port=8080,
+            port=self._port,
             size=(1280, 800),
             app_mode=app_mode,
         )
@@ -62,12 +63,12 @@ class GUIfy:
                     f"ERROR!: Another program is using port 8080. Please close it and try again.\n\n{str(env)}",
                     title="IO ERROR!")
                 raise
-
-            # If Chrome isn't found, fallback to Microsoft Edge on Win10 or greater
-            if sys.platform in ['win32', 'win64'] and int(platform.release()) >= 10:
-                eel.start(page, mode='edge', **eel_kwargs)
             else:
-                raise
+                # If Chrome isn't found, fallback to Microsoft Edge on Win10 or greater
+                if sys.platform in ['win32', 'win64'] and int(platform.release()) >= 10:
+                    eel.start(page, mode='edge', **eel_kwargs)
+                else:
+                    raise
 
         if debug:
             logging.basicConfig(level=logging.DEBUG)
