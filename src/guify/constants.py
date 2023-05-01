@@ -1,0 +1,7 @@
+MB_PARTNUM = 'mb_partnum'
+WAITING_FOR_RUN = 'idle'
+RUNNING_TEST = 'running'
+PENDING_USER_INPUT = 'pending'
+DONE = 'done'
+OK = 'ok'
+CANCEL = 'cancel'
