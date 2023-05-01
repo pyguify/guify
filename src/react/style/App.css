@@ -1,0 +1,95 @@
+/* .tab-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  min-height: calc(100vh - 150px);
+} */
+#layout {
+  padding-bottom: 20px;
+}
+#monitor-text {
+  margin-left: 10px;
+  margin-top: 10px;
+  min-height: calc(100vh - 100px);
+  width: 100%;
+}
+#run-tests-button {
+  margin-left: 10px;
+  margin-top: 10px;
+  width: 100%;
+}
+#worker-status {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  justify-content: center;
+}
+
+/* .form-control {
+  width: 90%;
+}
+.form-control:first-child {
+  margin-top: 20px;
+} */
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.form-check-label {
+  cursor: pointer;
+}
+
+input[type='checkbox'] {
+  cursor: pointer;
+}
+#test-list {
+  height: calc(50vh - 120px);
+  min-height: 200px;
+  overflow-y: scroll;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+#about {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+#params-form {
+  max-height: calc(50vh - 120px);
+  overflow-y: overlay;
+}
+
+.tab-content > .active {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+#config-tab-pane {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 150px);
+}
+
+.input-group-text {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-right: -1px;
+}
+
+#config-sidebar {
+  margin-top: 10px;
+  border-right: 1px solid #eaeaea;
+}
+
+#config-save-button {
+  margin: auto;
+  margin-top: 30px;
+  width: 80%;
+}

@@ -75,7 +75,7 @@ All configurations are stored in config.ini.
 - get(section, attribute) // load() and get value of attribute in section
 - set(section, attribute, value) // load() and set value of attribute in section and then save().
 
-### config file:
+### Config file:
 
 ```ini
 [example]
@@ -83,7 +83,7 @@ foo = bar
 ```
 
 ```py
-get_secion('example') -> {'foo': 'bar'}
+get_section('example') -> {'foo': 'bar'}
 get('example', 'foo') -> 'bar'
 ```
 

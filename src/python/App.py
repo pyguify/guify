@@ -21,6 +21,7 @@ class GUIfy:
 
     def register(self, priority: int = None, name: str = None, description: str = None):
         def decorator(func):
+            log.debug(f"Registering {func.__name__} as {name}")
             test = BaseTest(worker.pool, func, name, priority, description)
             test.run = func
             self.worker.pool.add((func.__name__, test))
@@ -29,41 +30,42 @@ class GUIfy:
     def prompt_user(self, prompt: str):
         return self.worker.set_prompt(prompt)
 
-    def run(self):
-        debug = 'dev' in sys.argv
-        """Start Eel with either production or development configuration."""
+    # _eel_kwargs is solely for development and testing purposes
+    def run(self, _eel_kwargs: dict = None):
         @eel.expose
         def app_name():
-            return self.app_name
-
-        if debug:
-            directory = 'src\\guify\\web'
-            app = None
-            page = 'index.html'
-            app_mode = False
-        else:
-            directory = os.path.join(os.path.dirname(
-                os.path.abspath(__file__)), 'web')
-            app = 'chrome'
-            page = 'index.html'
-            app_mode = True
-
-        eel.init(directory, ['.tsx', '.ts', '.jsx', '.js', '.html'])
+            log.debug(f"app_name called")
+            return "test"
+        log.debug("Starting GUIfy")
+        
+        directory = _eel_kwargs.get('directory', os.path.join(os.path.dirname(
+            os.path.abspath(__file__)), 'build'))
+        debug = _eel_kwargs.get('debug', False)
+        app = _eel_kwargs.get('app', 'chrome')
+        port = _eel_kwargs.get('port', self._port)
+        page = _eel_kwargs.get('page', 'index.html')
+        app_mode = _eel_kwargs.get('app_mode', True)
         eel_kwargs = dict(
             host='localhost',
-            port=self._port,
             size=(1280, 800),
             app_mode=app_mode,
         )
+        log.debug("initiating eel")
+        eel.init(directory, ['.tsx', '.ts', '.jsx', '.js', '.html'])
+
         try:
-            eel.start(page, mode=app, **eel_kwargs)
+            log.debug("starting eel")
+            eel.start(page, mode=app, port=port, **eel_kwargs)
         except EnvironmentError as env:
+            
             if "[WinError 10048]" in str(env):
+                log.exception(f"Port {port} is already in use")
                 alert(
-                    f"ERROR!: Another program is using port 8080. Please close it and try again.\n\n{str(env)}",
+                    f"ERROR!: Another program is using port {port}. Please close it and try again.\n\n{str(env)}",
                     title="IO ERROR!")
                 raise
             else:
+                log.debug("Chrome not found, trying Microsoft Edge")
                 # If Chrome isn't found, fallback to Microsoft Edge on Win10 or greater
                 if sys.platform in ['win32', 'win64'] and int(platform.release()) >= 10:
                     eel.start(page, mode='edge', **eel_kwargs)
