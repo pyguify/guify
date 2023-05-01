@@ -39,7 +39,7 @@ class GUIfy:
         log.debug("Starting GUIfy")
         
         directory = _eel_kwargs.get('directory', os.path.join(os.path.dirname(
-            os.path.abspath(__file__)), 'web'))
+            os.path.abspath(__file__)), 'build'))
         debug = _eel_kwargs.get('debug', False)
         app = _eel_kwargs.get('app', 'chrome')
         port = _eel_kwargs.get('port', self._port)
