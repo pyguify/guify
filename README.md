@@ -6,7 +6,9 @@ Simplest form of GUI for automation scripts.
 
 Made with eel as python backend and react used as frontend.
 
-Please see release branches for an optimized built react app
+main branch has built&optimized react app
+
+dev branch has development version of react app
 
 ## Main tab
 
