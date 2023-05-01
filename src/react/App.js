@@ -5,13 +5,14 @@ import './style/bootstrap/bootstrap-grid.min.css'
 import './style/bootstrap/bootstrap-reboot.min.css'
 import './style/App.css'
 export const eel = window.eel
-eel.set_host('ws://localhost:8080')
 
 const App = () => {
   return <Layout />
 }
 
-window.eel.app_name()((r) => {document.title = r})
+window.eel.app_name()((r) => {
+  document.title = r
+})
 
 function setMonitorText(text) {
   const monitor = document.getElementById('monitor-text')
