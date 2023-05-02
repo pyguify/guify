@@ -1,3 +1,3 @@
-include build/*
-include build/*/*
-include build/*/*/*
+include src/guify/web/*
+include src/guify/web/*/*
+include src/guify/web/*/*/*
