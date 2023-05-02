@@ -31,6 +31,8 @@ class ConfigTab:
 
     def set(self, section, key, value):
         self.load()
+        if not self._cfg.has_section(section):
+            self._cfg.add_section(section)
         self._cfg.set(section, key, value)
         self.save()
 
