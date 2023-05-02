@@ -1,8 +1,8 @@
 on:
   pull_request:
-    branches: [main]
+    branches: [dev]
   push:
-    branches: [main]
+    branches: [dev]
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14.x'
+          node-version: '16.x'
       - name: Install Node.js dependencies
         run: npm ci
 
@@ -35,10 +35,3 @@ jobs:
         run: |
           npm run build:js
           python -m build
-
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.8.5
-        with:
-          user: __token__
-          password: ${{ secrets.TWINE_API_KEY }}
-           
