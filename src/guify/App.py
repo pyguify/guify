@@ -31,7 +31,7 @@ class GUIfy:
         return self.worker.set_prompt(prompt)
 
     # _eel_kwargs is solely for development and testing purposes
-    def run(self, _eel_kwargs: dict = None):
+    def run(self, _eel_kwargs: dict = {}):
         @eel.expose
         def app_name():
             log.debug(f"app_name called")
