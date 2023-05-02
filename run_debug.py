@@ -1,4 +1,4 @@
-from src.python import GUIfy
+from src.guify import GUIfy
 import logging
 import sys
 logging.basicConfig(level=logging.DEBUG, filename='log.txt')
@@ -6,14 +6,14 @@ logging.basicConfig(level=logging.DEBUG, filename='log.txt')
 DEBUG = True
 if DEBUG:
     eel_kwargs = dict(
-            directory='src',
-            app = None,
-            page = {'port':3000},
-            port = 3001,
-            app_mode = False,
-            debug=True
+        directory='src',
+        app=None,
+        page={'port': 3000},
+        port=3001,
+        app_mode=False,
+        debug=True
     )
-app = GUIfy()
+app = GUIfy("Testing GUIfy")
 # app:
 # app.config.get('example', 'foo') -> 'bar' (from config.ini)
 # app.config.get_section('example') -> {'foo': 'bar'} (from config.ini)
