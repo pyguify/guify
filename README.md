@@ -1,105 +1,45 @@
 # GUIfy
 
----
-
 Simplest form of GUI for automation scripts.
 
 Made with eel as python backend and react used as frontend.
 
-main branch has built&optimized react app
-
-dev branch has development version of react app
+## **[For Quick Start docs click here](docs/README.md)**
 
 ## Main tab
 
-![main_tab](main_tab.png)
+![docs/images/main_tab](docs/images/main_tab.png)
 
 ## Config tab
 
-![config_tab](config_tab.png)
+![docs/images/config_tab](docs/images/config_tab.png)
 
-## How to use
+# Running the source code
 
----
+Since we're using react, i have made a custom script [run_debug.py](run_debug.py) to run the eel backend so it does not conflict with the react dev server port.
 
-### Quick start
+If you're working on the frontend use
 
 ```bash
-pip install guify
+npm run start
 ```
 
-Look inside [this example](docs/example.py) or follow the instructions below:
+This will start react dev server and run python too in same terminal instance.
 
-```py
-# main.py
-import GUIfy from guify
+If you're working on the python side, it is recommended to run the code in 2 seperate terminals:
 
-app = GUIfy(app_name='GUIfy') # default app_name is 'GUIfy'
+```bash
+# In first terminal
+npm run start:js
 
-@app.register(name='Test 1', priority=0, description='This is a test')
-def test_1(example_arg):
-   app.monitor.clear_text()
-   app.monitor.set_text('This is a test\n')
-   app.monitor.append_text('This is a test2\n')
-   result = app.prompt_user('This is a prompt') # True if user clicked OK, False if user clicked Cancel
-   foo = app.config.get('example','foo') # == bar
-
-
-
-app.run()
-
+# In second terminal
+npm run start:guify # or "py ./run_debug.py"
 ```
 
----
+This is because unlike React, python won't restart eel session on change of the guify source, so you'd end up restarting python a lot.
 
-### Monitor object
+# Building
 
-app.monitor is the monitor object representing the preview window on right hand side of the GUI,
-
-- set_text(text: str) -> None // will set the text in the monitor to whatever passed in "text" argument
-- append_text(text: str) -> None // will append the next to the monitor
-- clear_text(text: str) -> None // will clear all text in the monitor
-
----
-
-## Config tab
-
-"app.config" is an object representing the config tab.
-All configurations are stored in config.ini.
-
-### self.config methods:
-
-- save() // Save config to config.ini
-- load() // Load config from config.ini
-- get_section() // load() and return an entire section as a dictionary
-- get(section, attribute) // load() and get value of attribute in section
-- set(section, attribute, value) // load() and set value of attribute in section and then save().
-
-### Config file:
-
-```ini
-[example]
-foo = bar
-```
-
-```py
-get_section('example') -> {'foo': 'bar'}
-get('example', 'foo') -> 'bar'
-```
-
----
-
-## Settings
-
-in settings.ini you can change the following settings:
-
-- reports_dir - the directory where the reports will be saved
-- report_name_prefix - can be one of the variables passed in to your run() functions, uses this variable name as identification for reports
-
----
-
-## Building
-
-To build an executable in dist folder, run the following:
+To build the package (wheel and source) in dist folder, run the following:
 
 `npm run build`
