@@ -59,7 +59,6 @@ def all_tests():
 
 @eel.expose
 def worker_status():
-    log.debug(f"worker_status called")
     return {
         "state": worker.state,
         "currentJob": worker.currently_running,

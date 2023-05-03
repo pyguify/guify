@@ -27,16 +27,10 @@ class TestWorker(Thread):
                 cls, *args, **kwargs)  # type: ignore
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, report_dir=None, report_prefix=None):
         super().__init__(name='TestWorker')
-        self.cfg = TestWorker._init_config()
-        self.prefix_var = self.cfg.get('DEFAULT', 'report_name_prefix')
-
-        if self.prefix_var != '' and self.prefix_var is not None:
-            self.additional_params = [self.prefix_var,]
-        else:
-            self.additional_params = []
-
+        self._report_prefix = report_prefix
+        self._report_dir = report_dir
         self.pool = TestPool(self, *self.additional_params)
         self._state = WAITING_FOR_RUN
         self._prompt = None
@@ -46,28 +40,12 @@ class TestWorker(Thread):
         self._lock = Lock()
         self.queue = []
 
-    @staticmethod
-    def _init_config() -> ConfigParser:
-        # initialize the config file
-        # if no config file is found, create a new one
-        # if config file is found, load it
-        cfg = ConfigParser()
-        cfg_path = os.path.join(os.getcwd(), CFG_FILE_NAME)
-        if not os.path.isfile(cfg_path):
-            log.debug("Config file not found, creating new one.")
-            cfg['DEFAULT'] = {
-                'reports_dir': '',
-                'report_name_prefix': '',
-            }
-            with open(cfg_path, 'w') as f:
-                cfg.write(f)
+    @property
+    def additional_params(self):
+        if self._report_prefix is not None:
+            return [self._report_prefix,]
         else:
-            log.debug("Config file found, loading...")
-            if not cfg.has_option('DEFAULT', 'reports_dir'):
-                cfg.set('DEFAULT', 'reports_dir', '')
-            cfg.read(cfg_path)
-
-        return cfg
+            return []
 
     @property
     def prompt(self):
@@ -83,33 +61,29 @@ class TestWorker(Thread):
         # prefix is set in settings.ini
         # can be set to one of the arguments given to
         # one of the tests
-        return self.params[self.prefix_var] if self.prefix_var else 'report'
+        return self.params[self._report_prefix] if self._report_prefix else 'report'
+
+    def _create_report_folder(self, report_dir):
+        # creates the reports folder if it doesn't exist
+        # if the folder already exists, does nothing
+        if not os.path.isdir(report_dir):
+            os.mkdir(report_dir)
 
     def _get_reports_path(self):
         # returns the path to the reports folder
         # if no path is set, returns the default path
         # default path is 'reports' folder in the current working directory
         # path is set in settings.ini
-        default_path = os.path.join(os.getcwd(), DEFAULT_REPORTS_FOLDER_NAME)
-        configured_path = self.cfg.get('DEFAULT', 'reports_dir')
-        if configured_path == '' or configured_path is None:
-            log.debug("Reports path is not configured in settings.ini")
-            if not os.path.isdir(default_path):
-                log.debug(
-                    "Couldn't find default report directory, creating new folder.")
-                p = Path(default_path)
-                p.mkdir()
-            retval = os.path.abspath(default_path)
+        if self._report_dir is None:
+            log.debug("No report directory set, report generation is off")
+            return None
+        
+        if os.path.isabs(self._report_dir):
+            retval = self._report_dir
         else:
-            log.debug("Report directory is configured")
-            if not os.path.isdir(configured_path):
-                log.debug("Reports directory does not exist, creating...")
-                p = Path(configured_path)
-                p.mkdir(parents=True)
+            retval = os.path.join(os.getcwd(), self._report_dir)
 
-            log.debug("REPORTS PATH:" + configured_path)
-            retval = configured_path
-
+        self._create_report_folder(retval)
         return retval
 
     def finish_job(self, report: dict):
@@ -195,8 +169,10 @@ class TestWorker(Thread):
             return False
 
     def _save_report(self, report: dict):
-
+        log.debug("Saving report")
         reports_path = self._get_reports_path()
+        if reports_path is None:
+            return
 
         def get_filepath(i=1):
             # returns the file path for the report
