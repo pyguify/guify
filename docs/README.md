@@ -17,7 +17,11 @@ pip install guify
 import GUIfy from guify
 
 # Instantiate the app, variables are optional.
-app = GUIfy(app_name='GUIfy', port=8080) # default app_name is 'GUIfy'
+# app_name is the title of the app shown on the top, equivalent to <title /> tag in HTML
+# report_dir is the directory where reports will be stored
+# report_prefix is the prefix of the report, if none, it will be 'report'
+# if set to 'serial_number', this will be requested in the gui.
+app = GUIfy(app_name='GUIfy', port=8080, report_dir=None, report_prefix=None) # default app_name is 'GUIfy'
 
 # Register the function "test_1"
 # All variables are optional
@@ -25,8 +29,9 @@ app = GUIfy(app_name='GUIfy', port=8080) # default app_name is 'GUIfy'
 # priority - Sets the order of the tests, priority 0 will run before priority 1
 # description - the small text description under the test's name in the gui.
 @app.register(name='Test 1', priority=0, description='This is a test')
-# Define the test, each argument that "test_1" requires will be automatically prompted for in the gui.
-# if same arg name (example_arg) apperas on 2 different tests, it will be requested only once in the gui.
+# Define the test, each argument that "test_1"
+# requires will be automatically prompted for in the gui.
+# no arg will be requested twice.
 def test_1(example_arg):
     # app.monitor object represents the textarea on the right-hand side of the gui
     # app.monitor.clear_text() - sets the text to empty string
@@ -102,15 +107,6 @@ This will be the correct usage of app.config object
 app.config.get_section('example') -> {'foo': 'bar'}
 app.config.get('example', 'foo') -> 'bar'
 ```
-
----
-
-## Settings
-
-in settings.ini you can change the following settings:
-
-- reports_dir - Optional defualt is "reports/" the directory where the reports will be saved
-- report_name_prefix - Optional: Can be one of the variables passed to registered functions, uses this variable name as identification for reports
 
 ---
 
