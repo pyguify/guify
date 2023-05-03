@@ -9,6 +9,7 @@ import logging
 from .constants import OK, CANCEL, WAITING_FOR_RUN, RUNNING_TEST, PENDING_USER_INPUT, DONE
 from .Monitor import Monitor
 from .ConfigTab import ConfigTab
+import traceback
 
 CFG_FILE_NAME = 'settings.ini'
 DEFAULT_REPORTS_FOLDER_NAME = 'reports'
@@ -77,7 +78,7 @@ class TestWorker(Thread):
         if self._report_dir is None:
             log.debug("No report directory set, report generation is off")
             return None
-        
+
         if os.path.isabs(self._report_dir):
             retval = self._report_dir
         else:
@@ -160,9 +161,10 @@ class TestWorker(Thread):
             return result
 
         except Exception as exc:
-            exc_str = f"Exception: {exc} in {test._name}"
-            log.error(exc_str)
 
+            exc_str = f"{exc.__class__.__name__}: {exc} in {test._name}"
+            log.error(exc_str)
+            print(traceback.format_exc())
             self.stop()
 
             self.set_prompt(exc_str)
