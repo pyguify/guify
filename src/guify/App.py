@@ -10,15 +10,23 @@ from pymsgbox import alert
 log = logging.getLogger("\tindex.py")
 worker = TestWorker()
 
-
 class GUIfy:
-    def __init__(self, app_name='GUIfy', port=8080):
+    # report_dir is the directory of the reports
+    
+    # report_prefix is the prefix of the report file
+    # report_prefix can be set to one of the arguments
+    # that is required by registered functions. For example:
+    # if a registered function requires argument name and age
+    # then report_prefix can be set to 'name' or 'age'.
+    def __init__(self, app_name='GUIfy', port=8080, report_dir=None, report_prefix=None):
         self._port = port
         self._app_name = app_name
         eel.expose(self.app_name)
+        worker._report_dir = report_dir
+        worker._report_prefix = report_prefix
         self.worker = worker
-        self.monitor = worker.monitor
-        self.config = worker.config_tab
+        self.monitor = self.worker.monitor
+        self.config = self.worker.config_tab
 
     def app_name(self):
         return self._app_name
