@@ -101,9 +101,11 @@ class TestWorker(Thread):
         self._wait_for_unpause()
         self._state = WAITING_FOR_RUN
         self.currently_running = None
-
+        self.pause.clear()
+        self._halt.clear()
         log.debug('"Restarting" thread')
         super().__init__(name='TestWorker')
+        self._lock.release()
 
     def set_prompt(self, message):
         self.pause.set()
@@ -112,6 +114,7 @@ class TestWorker(Thread):
         return self._wait_for_response()
 
     def stop(self):
+        self.pause.clear()
         self._halt.set()
         self._lock.acquire()
         self.currently_running = None
@@ -165,7 +168,6 @@ class TestWorker(Thread):
             exc_str = f"{exc.__class__.__name__}: {exc} in {test._name}"
             log.error(exc_str)
             print(traceback.format_exc())
-            self.stop()
 
             self.set_prompt(exc_str)
             return False
@@ -227,7 +229,7 @@ class TestWorker(Thread):
         return {key: None for key in self.queue}
 
     def run(self):
-        self.monitor.clear_text()
+        self.monitor.flush()
         self._halt.clear()
         report = self._get_initial_report()
         log.info("Starting Worker Thread")
@@ -241,7 +243,7 @@ class TestWorker(Thread):
 
                 report[test._name] = status
                 if status is False:
-                    self._halt.set()
+                    self.stop()
                     break
 
         self.finish_job(report)
