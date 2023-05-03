@@ -10,7 +10,7 @@ import os
 import eel
 from .constants import OK, CANCEL, WAITING_FOR_RUN, PENDING_USER_INPUT, DONE
 from .App import worker, GUIfy
-import logging 
+import logging
 
 '''
 Author github: @MikeyDN
@@ -43,15 +43,15 @@ def run_tests(tests, params):
 @eel.expose
 def all_tests():
     log.debug(f"all_tests called")
-    def NoneIfEmpty(x): return x if x != '' else None
+
     retval = {
         "tests": [
             {
-                "name": name,
-                "requiredParams": cls.required_params,
-                "description": cls.description,
-                "verbose_name": NoneIfEmpty(cls.verbose_name)
-            } for name, cls in worker.pool
+                "name": test._name,
+                "requiredParams": test.required_params,
+                "description": test.description,
+                "verbose_name": test.name
+            } for test in worker.pool
         ]
     }
     return retval
@@ -59,7 +59,6 @@ def all_tests():
 
 @eel.expose
 def worker_status():
-    log.debug(f"worker_status called")
     return {
         "state": worker.state,
         "currentJob": worker.currently_running,
@@ -81,6 +80,7 @@ def all_params():
     all_params = list(worker.pool.required_params)
     all_params.sort()
     return {"params": all_params}
+
 
 @eel.expose
 def answer_prompt(response):

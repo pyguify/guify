@@ -1,5 +1,11 @@
 # GUIfy
 
+![PyPI_version](https://img.shields.io/pypi/v/guify?style=for-the-badge)
+
+![PyPI_downloads](https://img.shields.io/pypi/dm/guify?style=for-the-badge)
+
+![PyPI_wheel](https://img.shields.io/pypi/wheel/guify?style=for-the-badge)
+
 Simplest form of GUI for automation scripts.
 
 Made with eel as python backend and react used as frontend.

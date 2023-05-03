@@ -14,7 +14,11 @@ window.eel.app_name()((r) => {
   document.title = r
 })
 
+// for some weird reason declaring this function
+// inside the react component doesn't work
+// so we declare it here:
 function setMonitorText(text) {
+  // the Monitor is the textarea on the right hand side.
   const monitor = document.getElementById('monitor-text')
   if (!monitor) return
   let currentScrollPosition =
