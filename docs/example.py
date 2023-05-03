@@ -14,15 +14,15 @@ app = guify.GUIfy()
 
 @app.register(priority=1, name="test 1", description="test1")
 def test1(test_arg):
-    app.monitor.append_text("Running test1\n")
-    app.monitor.append_text(str(app.prompt_user(test_arg)) + "\n")
+    print("Running test1\n")
+    print(str(app.prompt_user(test_arg)) + "\n")
 
     return True
 
 
 @app.register(priority=0, name="test 2", description="test2")
 def test2(test_arg2):
-    app.monitor.append_text("Running test2\n")
+    print("Running test2\n")
 
     return True
 
