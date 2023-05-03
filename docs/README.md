@@ -34,8 +34,8 @@ app = GUIfy(app_name='GUIfy', port=8080, report_dir=None, report_prefix=None, re
 # no arg will be requested twice.
 def test_1(example_arg):
     # app.monitor object represents the textarea on the right-hand side of the gui
-    # app.monitor.clear_text() - sets the text to empty string
-    app.monitor.clear_text()
+    # app.monitor.flush() - sets the text to empty string
+    app.monitor.flush()
 
     # app.monitor.set_text(text) - sets the text to whatever is passed to it
     app.monitor.write('This is a test\n')
@@ -60,7 +60,7 @@ def test_1(example_arg):
 # this test will be registered after test_1, because its priority arg is higher.
 @app.register(name='Test 2', priority=1, description='This is the second test.')
 def test_2(example_arg, second_arg):
-    app.monitor.clear_text()
+    app.monitor.flush()
 
 
 
@@ -77,7 +77,7 @@ app.monitor is the monitor object representing the preview window on right hand 
 
 - set_text(text: str) -> None // will set the text in the monitor to whatever passed in "text" argument
 - write(text: str) -> None // will append the next to the monitor, print() also works
-- clear_text(text: str) -> None // will clear all text in the monitor
+- flush(text: str) -> None // will clear all text in the monitor
 
 ---
 

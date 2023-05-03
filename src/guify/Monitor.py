@@ -12,6 +12,6 @@ class Monitor:
         self.text += str(text)
         eel.set_text(self.text)
 
-    def clear_text(self):
+    def flush(self):
         self.text = ""
         eel.set_text(self.text)

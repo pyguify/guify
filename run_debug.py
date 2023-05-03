@@ -21,7 +21,7 @@ app = GUIfy("Testing GUIfy", redirect_stdout=True)
 # app.monitor // text area object in the main tab
 # app.monitor.append_text('hello world\n') // appends text to the text area
 # app.monitor.set_text('hello world\n') // sets the text area to 'hello world'
-# app.monitor.clear_text() // clears the text area
+# app.monitor.flush() // clears the text area
 # app.prompt_user('prompt') -> (True if OK, False if CANCEL)
 
 
