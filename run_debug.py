@@ -13,7 +13,7 @@ if DEBUG:
         app_mode=False,
         debug=True
     )
-app = GUIfy("Testing GUIfy")
+app = GUIfy("Testing GUIfy", redirect_stdout=True)
 # app:
 # app.config.get('example', 'foo') -> 'bar' (from config.ini)
 # app.config.get_section('example') -> {'foo': 'bar'} (from config.ini)
@@ -27,15 +27,13 @@ app = GUIfy("Testing GUIfy")
 
 @app.register(priority=1, name="test 1", description="test1")
 def test1(test_arg):
-    app.monitor.append_text("Running test1\n")
-    app.monitor.append_text(str(app.prompt_user(test_arg)) + "\n")
-
+    print("Running test!")
+    raise Exception("Test exception")
     return True
 
 
 @app.register(priority=0, name="test 2", description="test2")
 def test2(test_arg2):
-    app.monitor.append_text("Running test2\n")
 
     return True
 
