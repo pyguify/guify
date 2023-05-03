@@ -8,10 +8,10 @@ class Monitor:
     def set_text(self, text):
         eel.set_text(text)
 
-    def append_text(self, text):
+    def write(self, text):
         self.text += str(text)
         eel.set_text(self.text)
 
-    def clear_text(self):
+    def flush(self):
         self.text = ""
         eel.set_text(self.text)

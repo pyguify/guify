@@ -17,11 +17,11 @@ pip install guify
 import GUIfy from guify
 
 # Instantiate the app, variables are optional.
-# app_name is the title of the app shown on the top, equivalent to <title /> tag in HTML
-# report_dir is the directory where reports will be stored
-# report_prefix is the prefix of the report, if none, it will be 'report'
-# if set to 'serial_number', this will be requested in the gui.
-app = GUIfy(app_name='GUIfy', port=8080, report_dir=None, report_prefix=None) # default app_name is 'GUIfy'
+# - app_name is the title of the app shown on the top, equivalent to <title /> tag in HTML
+# - report_dir is the directory where reports will be stored if none reports are disabled.
+# - report_prefix // the name of the variable to take the prefix from, default is "report_*.txt"
+# - redirect_stdout // if True, will redirect stdout to the monitor, default is True
+app = GUIfy(app_name='GUIfy', port=8080, report_dir=None, report_prefix=None, redirect_stdout=True) # default app_name is 'GUIfy'
 
 # Register the function "test_1"
 # All variables are optional
@@ -34,14 +34,14 @@ app = GUIfy(app_name='GUIfy', port=8080, report_dir=None, report_prefix=None) # 
 # no arg will be requested twice.
 def test_1(example_arg):
     # app.monitor object represents the textarea on the right-hand side of the gui
-    # app.monitor.clear_text() - sets the text to empty string
-    app.monitor.clear_text()
+    # app.monitor.flush() - sets the text to empty string
+    app.monitor.flush()
 
     # app.monitor.set_text(text) - sets the text to whatever is passed to it
-    app.monitor.set_text('This is a test\n')
+    app.monitor.write('This is a test\n')
 
-    # app.monitor.append_text(text) - appends whatever passed to it to the textarea
-    app.monitor.append_text('This is a test2\n')
+    # print function will also print to the monitor
+    print('This is a test2\n')
 
     # app.prompt_user(prompt) - pops up a modal in the gui and asks user to click OK or cancel.
     # app.prompt_user will return True if user clicked OK and False if user clicked cancel
@@ -60,7 +60,7 @@ def test_1(example_arg):
 # this test will be registered after test_1, because its priority arg is higher.
 @app.register(name='Test 2', priority=1, description='This is the second test.')
 def test_2(example_arg, second_arg):
-    app.monitor.clear_text()
+    app.monitor.flush()
 
 
 
@@ -76,8 +76,8 @@ app.run()
 app.monitor is the monitor object representing the preview window on right hand side of the GUI,
 
 - set_text(text: str) -> None // will set the text in the monitor to whatever passed in "text" argument
-- append_text(text: str) -> None // will append the next to the monitor
-- clear_text(text: str) -> None // will clear all text in the monitor
+- write(text: str) -> None // will append the next to the monitor, print() also works
+- flush(text: str) -> None // will clear all text in the monitor
 
 ---
 
@@ -117,5 +117,4 @@ Theoretically its possible to build an executable with eel using the following:
 ```bash
 py -m eel index.py build --onefile --noconsole --name <whatever_u_want> --icon=public/favicon.ico
 ```
-
-Please not that this hasn't been tested yet.
+Please note that eel build hasn't been tested yet.

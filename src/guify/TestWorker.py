@@ -9,6 +9,7 @@ import logging
 from .constants import OK, CANCEL, WAITING_FOR_RUN, RUNNING_TEST, PENDING_USER_INPUT, DONE
 from .Monitor import Monitor
 from .ConfigTab import ConfigTab
+import traceback
 
 CFG_FILE_NAME = 'settings.ini'
 DEFAULT_REPORTS_FOLDER_NAME = 'reports'
@@ -77,7 +78,7 @@ class TestWorker(Thread):
         if self._report_dir is None:
             log.debug("No report directory set, report generation is off")
             return None
-        
+
         if os.path.isabs(self._report_dir):
             retval = self._report_dir
         else:
@@ -100,9 +101,11 @@ class TestWorker(Thread):
         self._wait_for_unpause()
         self._state = WAITING_FOR_RUN
         self.currently_running = None
-
+        self.pause.clear()
+        self._halt.clear()
         log.debug('"Restarting" thread')
         super().__init__(name='TestWorker')
+        self._lock.release()
 
     def set_prompt(self, message):
         self.pause.set()
@@ -111,6 +114,7 @@ class TestWorker(Thread):
         return self._wait_for_response()
 
     def stop(self):
+        self.pause.clear()
         self._halt.set()
         self._lock.acquire()
         self.currently_running = None
@@ -160,10 +164,10 @@ class TestWorker(Thread):
             return result
 
         except Exception as exc:
-            exc_str = f"Exception: {exc} in {test._name}"
-            log.error(exc_str)
 
-            self.stop()
+            exc_str = f"{exc.__class__.__name__}: {exc} in {test._name}"
+            log.error(exc_str)
+            print(traceback.format_exc())
 
             self.set_prompt(exc_str)
             return False
@@ -225,7 +229,7 @@ class TestWorker(Thread):
         return {key: None for key in self.queue}
 
     def run(self):
-        self.monitor.clear_text()
+        self.monitor.flush()
         self._halt.clear()
         report = self._get_initial_report()
         log.info("Starting Worker Thread")
@@ -239,7 +243,7 @@ class TestWorker(Thread):
 
                 report[test._name] = status
                 if status is False:
-                    self._halt.set()
+                    self.stop()
                     break
 
         self.finish_job(report)
