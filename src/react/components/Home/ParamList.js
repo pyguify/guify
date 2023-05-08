@@ -31,6 +31,13 @@ export default function ParamList(props) {
     })
   }, [setParams])
 
+  const toTitleCase = (str) => {
+    return str.replace(
+      /\w\S*/g,
+      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
+    )
+  }
+
   return (
     <Container id="params">
       <form id="params-form">
@@ -40,7 +47,7 @@ export default function ParamList(props) {
               type="text"
               className="mb-2"
               name={param}
-              placeholder={param}
+              placeholder={toTitleCase(param.replace('_', ' '))}
               key={param}
               disabled={workerStatus !== 'idle'}
               value={paramValues[param]}
