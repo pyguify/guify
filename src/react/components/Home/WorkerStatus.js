@@ -45,14 +45,17 @@ export default function WorkerStatus() {
   }
 
   const statusVariant = () => {
-    if (status === statuses.idle) {
-      return 'secondary'
-    } else if (status === statuses.running) {
-      return 'primary'
-    } else if (status === statuses.pending) {
-      return 'warning'
-    } else if (status === statuses.done) {
-      return 'info'
+    switch (status) {
+      case statuses.idle:
+        return 'secondary'
+      case statuses.running:
+        return 'primary'
+      case statuses.pending:
+        return 'warning'
+      case statuses.done:
+        return 'info'
+      default:
+        return 'secondary'
     }
   }
 

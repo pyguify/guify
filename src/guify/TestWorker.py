@@ -105,7 +105,8 @@ class TestWorker(Thread):
         self._halt.clear()
         log.debug('"Restarting" thread')
         super().__init__(name='TestWorker')
-        self._lock.release()
+        if self._lock.locked():
+            self._lock.release()
 
     def set_prompt(self, message):
         self.pause.set()
