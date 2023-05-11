@@ -11,7 +11,7 @@ class BaseTest:
             self._verbose_name = func.__name__.replace(
                 "_", " ")
         self.priority = priority
-        self.description = description or self.description
+        self.description = description
         self.run = func
         self._name = func.__name__
 
