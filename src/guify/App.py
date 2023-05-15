@@ -20,6 +20,24 @@ class GUIfy:
     # if a registered function requires argument name and age
     # then report_prefix can be set to 'name' or 'age'.
     def __init__(self, app_name='GUIfy', port=8080, report_dir=None, report_prefix=None, redirect_stdout=True):
+        """
+        Initialize the GUIfy object.
+
+        :param app_name: The name of the app to display in the GUI.
+        :type app_name: str (default: "GUIfy")
+
+        :param port: The port to run the GUI on.
+        :type port: int (default: 8080)
+
+        :param report_dir: The directory to save the reports in.
+        :type report_dir: str or None
+
+        :param report_prefix: The prefix of the report file.
+        :type report_prefix: str or none
+
+        :param redirect_stdout: Whether to redirect stdout to the GUI.
+        :type redirect_stdout: bool (default: True)
+        """
         self._port = port
         self._app_name = app_name
         eel.expose(self.app_name)
@@ -33,15 +51,48 @@ class GUIfy:
             sys.stdout = self.monitor
 
     def app_name(self):
+        """
+        return the name of the app
+        :return: The name of the app
+        :rtype: str
+        """
         return self._app_name
 
     def register(self, priority: int = None, name: str = None, description: str = None):
+        """
+        A decorator to register a function to the GUI.
+
+        :param priority: The priority of the function. The higher the priority,
+        the higher the function will appear in the GUI.
+        :type priority: int or None
+
+        :param name: The name of the function to display in the GUI.
+        :type name: str or None
+
+        :param description: The description of the function to display in the GUI.
+        :type description: str or None
+
+        :return: The decorator function.
+        :rtype: function
+        """
         def decorator(func):
             self.worker.pool.add(func, name,
                                  priority, description)
         return decorator
 
     def prompt_user(self, prompt: str):
+        """
+        Prompt the user for input.
+        Shows a prompt to the user to click Ok or Cancel and waits for the user to respond.
+
+        :param prompt: The prompt to show to the user.
+        :type prompt: str
+
+        :return: The response of the user.
+        :rtype: str
+
+        :raises: ValueError if prompt is not a string.
+        """
         return self.worker.set_prompt(prompt)
 
     def _get_eel_kwargs_from_dict(self, kwargs: dict):
@@ -55,7 +106,9 @@ class GUIfy:
         return directory, debug, app, port, page, app_mode
 
     def run(self, _eel_kwargs: dict = {}):
-        # _eel_kwargs is solely for development and testing purposes
+        """
+        Run the main loop of the GUI.
+        """
         directory, debug, app, port, page, app_mode = self._get_eel_kwargs_from_dict(
             _eel_kwargs)
 
