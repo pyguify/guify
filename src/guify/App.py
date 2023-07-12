@@ -105,7 +105,7 @@ class GUIfy:
         app_mode = kwargs.get('app_mode', True)
         return directory, debug, app, port, page, app_mode
 
-    def run(self, _eel_kwargs: dict = {}):
+    def run(self, host='localhost', _eel_kwargs: dict = {}):
         """
         Run the main loop of the GUI.
         """
@@ -114,7 +114,7 @@ class GUIfy:
 
         log.debug("Starting GUIfy")
         eel_kwargs = dict(
-            host='localhost',
+            host=host,
             size=(1280, 800),
             app_mode=app_mode,
         )
