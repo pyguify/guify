@@ -22,7 +22,7 @@ Made with eel as python backend and react used as frontend.
 
 # Running the source code
 
-Since we're using react, i have made a custom script [run_debug.py](../run_debug.py) to run the eel backend so it does not conflict with the react dev server port.
+Since we're using react, there's a custom script [run_debug.py](../run_debug.py) to run the eel backend so it does not conflict with the react dev server port.
 
 If you're working on the frontend use
 
