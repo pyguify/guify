@@ -8,17 +8,13 @@ export default function ParamList(props) {
   const [workerStatus, setWorkerStatus] = useState('idle')
 
   const updateStatus = () => {
-    eel.worker_status()(({ state }) => {
+    eel.worker_status()(({ state, params }) => {
       if (state !== workerStatus) {
         setWorkerStatus(state)
       }
       setWorkerStatus(state)
+      setParamValues(params)
     })
-    if (workerStatus !== 'idle' && workerStatus !== 'done') {
-      eel.current_job_params()(({ params }) => {
-        setParamValues(params)
-      })
-    }
   }
 
   useEffect(() => {
@@ -34,7 +30,7 @@ export default function ParamList(props) {
   const toTitleCase = (str) => {
     return str.replace(
       /\w\S*/g,
-      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
+      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
     )
   }
 
@@ -50,7 +46,7 @@ export default function ParamList(props) {
               placeholder={toTitleCase(param.replace('_', ' '))}
               key={param}
               disabled={workerStatus !== 'idle'}
-              value={paramValues[param]}
+              {...(workerStatus !== 'idle' && { value: paramValues[param] })}
             />
           ))}
       </form>
