@@ -39,6 +39,7 @@ class TestWorker(Thread):
         self.pause = Event()
         self._halt = Event()
         self._lock = Lock()
+        self.params = dict()
         self.queue = []
 
     @property
@@ -200,7 +201,7 @@ class TestWorker(Thread):
         log.debug(f"Running test: {test._name}")
         params = self._purge_kwargs(test.required_params)
         try:
-            self.currently_running = test.name
+            self.currently_running = test._name
 
             # Stop running if halt flag is True
             if self._halt.is_set():
@@ -264,7 +265,6 @@ class TestWorker(Thread):
         :param parameters: The parameters to run the tests with.
         :type parameters: dict
         '''
-
         self._state = RUNNING_TEST
         if parameters is None or tests is None:
             self._state = WAITING_FOR_RUN
