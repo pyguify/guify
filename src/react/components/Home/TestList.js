@@ -16,8 +16,8 @@ export default function TestList() {
   const [currentJob, setCurrentJob] = useState('')
 
   const updateQueue = () => {
-    eel.worker_status()(({ queue, state, currentJob }) => {
-      setQueue(queue)
+    eel.worker_status()(({ selectedTests, state, currentJob }) => {
+      setQueue(selectedTests)
       setWorkerStatus(state)
       setCurrentJob(currentJob)
     })
@@ -47,7 +47,7 @@ export default function TestList() {
                     type="checkbox"
                     className="test-checkbox"
                     name={name}
-                    {...(workerStatus !== 'idle' && {
+                    {...(workerStatus === 'running' && {
                       checked: queue.includes(name),
                     })}
                   />

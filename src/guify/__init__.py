@@ -84,7 +84,7 @@ def worker_status():
         "state": worker.state,
         "currentJob": worker.currently_running,
         "prompt": worker.prompt,
-        "queue": worker.queue,
+        "selectedTests": worker.selected_tests,
         "params": worker.params
     }
 

@@ -40,6 +40,7 @@ class TestWorker(Thread):
         self._halt = Event()
         self._lock = Lock()
         self.params = dict()
+        self.selected_tests = []
         self.queue = []
 
     @property
@@ -265,6 +266,7 @@ class TestWorker(Thread):
         :param parameters: The parameters to run the tests with.
         :type parameters: dict
         '''
+        self.selected_tests = tests.copy()
         self._state = RUNNING_TEST
         if parameters is None or tests is None:
             self._state = WAITING_FOR_RUN
