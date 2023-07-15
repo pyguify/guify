@@ -5,54 +5,36 @@ import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import { eel } from '../../App'
 
-export default function WorkerStatus() {
-  const statuses = useMemo(() => {
-    return {
-      idle: 'idle',
-      running: 'running',
-      pending: 'pending',
-      done: 'done',
-    }
-  }, [])
-
-  const [status, setStatus] = useState(statuses.idle)
-  const [currentJob, setCurrentJob] = useState(null)
-  const [prompt, setPrompt] = useState(null)
-
-  const updateStatus = () => {
-    eel.worker_status()((r) => {
-      if (r.state !== status) {
-        setStatus(r.state)
-      }
-      if (currentJob !== r.currentJob) {
-        setCurrentJob(r.currentJob)
-      }
-      if (prompt !== r.prompt) {
-        setPrompt(r.prompt)
-      }
+export default function WorkerStatus({
+  workerState,
+  workerStates,
+  currentJob,
+  promptText,
+  promptTitle,
+  setPrompt,
+}) {
+  const answerOk = () => {
+    eel.answer_prompt('ok')(() => {
+      console.log('answered prompt')
+      setPrompt(null)
+    })
+  }
+  const answerCancel = () => {
+    eel.answer_prompt('cancel')(() => {
+      console.log('answered prompt')
+      setPrompt(null)
     })
   }
 
-  useEffect(() => {
-    setInterval(updateStatus, 1000)
-  }, [updateStatus])
-
-  const answerPrompt = (answer) => {
-    return () => {
-      eel.answer_prompt(answer)
-      setPrompt(null)
-    }
-  }
-
   const statusVariant = () => {
-    switch (status) {
-      case statuses.idle:
+    switch (workerState) {
+      case workerStates.idle:
         return 'secondary'
-      case statuses.running:
+      case workerStates.running:
         return 'primary'
-      case statuses.pending:
+      case workerStates.pending:
         return 'warning'
-      case statuses.done:
+      case workerStates.done:
         return 'info'
       default:
         return 'secondary'
@@ -61,16 +43,16 @@ export default function WorkerStatus() {
 
   return (
     <>
-      <Modal show={prompt} backdrop="static" keyboard={false}>
+      <Modal show={promptText} backdrop="static" keyboard={false}>
         <Modal.Header>
-          <Modal.Title>Please Confirm</Modal.Title>
+          <Modal.Title>{promptTitle}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>{prompt}</Modal.Body>
+        <Modal.Body>{promptText}</Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={answerPrompt('cancel')}>
+          <Button variant="secondary" onClick={answerCancel}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={answerPrompt('ok')}>
+          <Button variant="primary" onClick={answerOk}>
             OK
           </Button>
         </Modal.Footer>
@@ -78,7 +60,7 @@ export default function WorkerStatus() {
 
       <ListGroup id="worker-status" horizontal>
         <ListGroup.Item variant={statusVariant()}>
-          Status: {status}
+          Status: {workerState}
         </ListGroup.Item>
         <ListGroup.Item variant={statusVariant()}>
           Current Job: {!currentJob && 'None'} {currentJob}

@@ -57,6 +57,9 @@ class TestPool:
             self._order.append(func.__name__)
         else:
             self._order.insert(priority, func.__name__)
+        for param in test.required_params:
+            if param not in self.worker.params:
+                self.worker.params[param] = ''
 
         self._pool[func.__name__] = test
 

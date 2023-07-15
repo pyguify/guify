@@ -1,6 +1,6 @@
 from src.guify import GUIfy
 import logging
-import sys
+from time import sleep
 logging.basicConfig(level=logging.DEBUG, filename='log.txt')
 
 DEBUG = True
@@ -25,16 +25,19 @@ app = GUIfy("Testing GUIfy", redirect_stdout=True)
 # app.prompt_user('prompt') -> (True if OK, False if CANCEL)
 
 
-@app.register(priority=1, name="test 1", description="test1")
+@app.register(priority=0, name="test 1", description="test1")
 def test1(test_arg):
+    app.prompt_user("Please confirm:", "test1")
     print("Running test!")
-    raise Exception("Test exception")
+
     return True
 
 
-@app.register(priority=0, name="test 2", description="test2")
+@app.register(priority=1, name="test 2", description="test2")
 def test2(test_arg2):
-
+    print("Running test2!")
+    print(app.prompt_user("Please confirm:", "test2"))
+    app.sleep(5)
     return True
 
 
