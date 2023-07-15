@@ -80,7 +80,7 @@ class GUIfy:
                                  priority, description)
         return decorator
 
-    def prompt_user(self, prompt: str):
+    def prompt_user(self, title: str, prompt: str):
         """
         Prompt the user for input.
         Shows a prompt to the user to click Ok or Cancel and waits for the user to respond.
@@ -93,7 +93,18 @@ class GUIfy:
 
         :raises: ValueError if prompt is not a string.
         """
-        return self.worker.set_prompt(prompt)
+        self.worker.raise_prompt(title, prompt)
+
+    def sleep(self, seconds: int):
+        """
+        Sleep for the specified number of seconds.
+
+        :param seconds: The number of seconds to sleep.
+        :type seconds: int
+
+        :raises: ValueError if seconds is not an integer.
+        """
+        eel.sleep(seconds)
 
     def _get_eel_kwargs_from_dict(self, kwargs: dict):
         dirname = os.path.dirname(os.path.abspath(__file__))

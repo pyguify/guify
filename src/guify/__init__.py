@@ -37,13 +37,13 @@ def run_tests(tests, params):
         return {"error": f"Worker is currenty busy, Status: {worker.state}"}
     else:
         try:
-            worker.start(tests, params)
+            worker.start()
         except Exception as exc:
             return {"error": f"Error: {exc}"}
         else:
             return {
                 "state": worker.state,
-                "currentJob": worker.currently_running,
+                "currentJob": worker.current_job,
                 "prompt": worker.prompt
             }
 
@@ -72,21 +72,85 @@ def all_tests():
 
 
 @eel.expose
-def worker_status():
-    """
+def get_state():
+    '''
     The function that gets called from the GUI to get the current state of the
     worker.
 
     :return: A dictionary containing the current state of the worker.
-    :rtype: {state: str, currentJob: str, prompt: str}
-    """
-    return {
-        "state": worker.state,
-        "currentJob": worker.currently_running,
-        "prompt": worker.prompt,
-        "queue": worker.queue,
-        "params": worker.params
-    }
+    :rtype: { workerState: str }
+    '''
+    return worker.state
+
+
+@eel.expose
+def get_current_job():
+    '''
+    The function that gets called from the GUI to get the current job of the
+    worker.
+
+    :return: A dictionary containing the current job of the worker.
+    :rtype: { currentJob: str }
+    '''
+    return worker.current_job
+
+
+@eel.expose
+def set_param(key, value):
+    '''
+    The function that gets called from the GUI to set a parameter for the
+    worker.
+
+    :param key: The key of the parameter.
+    :type key: str
+    :param value: The value of the parameter.
+    :type value: str
+    :return: A dictionary containing the current state of the worker.
+    :rtype: {status: {state: str, currentJob: str, prompt: str}}
+    '''
+    log.debug(f"set_param called with key: {key}, value: {value}")
+    if worker.state == WAITING_FOR_RUN:
+        worker.set_param(key, value)
+        eel.update_params(worker.params)
+        return worker.params
+    else:
+        return {"error": f"Worker is currenty busy, Status: {worker.state}"}
+
+
+@eel.expose
+def get_params():
+    '''
+    The function that gets called from the GUI to get the current parameters of
+    the worker.
+
+    :return: A dictionary containing the current parameters of the worker.
+    :rtype: dict
+    '''
+    return worker.params
+
+
+@eel.expose
+def get_prompt():
+    '''
+    The function that gets called from the GUI to get the current prompt of the
+    worker.
+
+    :return: A dictionary containing the current prompt of the worker.
+    :rtype: { title: str, 'message': str }
+    '''
+    return worker.prompt
+
+
+@eel.expose
+def get_queue():
+    '''
+    The function that gets called from the GUI to get the current queue of the
+    worker.
+
+    :return: A dictionary containing the current queue of the worker.
+    :rtype: { queue: [str] }
+    '''
+    return worker.selected_tests
 
 
 @eel.expose
@@ -98,9 +162,9 @@ def current_job_params():
     :rtype: {params: dict}
     """
     log.debug(f"current_job_params called")
-    if worker.currently_running is None:
-        return {"params": {}}  # No job is running
-    return {"params": worker.params}
+    if worker.current_job is None:
+        return {}  # No job is running
+    return worker.params
 
 
 @eel.expose
@@ -137,7 +201,7 @@ def answer_prompt(response):
             return {
                 "status": {
                     "state": worker.state,
-                    "currentJob": worker.currently_running,
+                    "currentJob": worker.current_job,
                     "prompt": worker.prompt
                 }
             }
@@ -183,5 +247,35 @@ def save_config(config: dict):
     log.debug(f"save_config called with config: {config}")
     worker.config_tab.save(config)
     return {'config': worker.config_tab.load()}
+
+
+@eel.expose
+def add_to_queue(tests: list[str]):
+    """
+    The function that gets called from the GUI to add tests to the queue
+
+    :param tests: A list of tests to add to the queue
+    :type tests: [str]
+    :return: A dictionary containing the current queue of the worker.
+    :rtype: { queue: [str] }
+    """
+    log.debug(f"add_to_queue called with tests: {tests}")
+    worker.add_to_queue(tests)
+    eel.set_queue(worker.selected_tests)
+
+
+@eel.expose
+def remove_from_queue(tests: list[str]):
+    """
+    The function that gets called from the GUI to remove tests from the queue
+
+    :param tests: A list of tests to remove from the queue
+    :type tests: [str]
+    :return: A dictionary containing the current queue of the worker.
+    :rtype: { queue: [str] }
+    """
+    log.debug(f"remove_from_queue called with tests: {tests}")
+    worker.remove_from_queue(tests)
+    eel.set_queue(worker.selected_tests)
 
 ### End eel functions ###
