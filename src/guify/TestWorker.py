@@ -10,6 +10,7 @@ from .constants import OK, CANCEL, WAITING_FOR_RUN, RUNNING_TEST, PENDING_USER_I
 from .Monitor import Monitor
 from .ConfigTab import ConfigTab
 import traceback
+import eel
 
 CFG_FILE_NAME = 'settings.ini'
 DEFAULT_REPORTS_FOLDER_NAME = 'reports'
@@ -34,14 +35,32 @@ class TestWorker(Thread):
         self._report_dir = report_dir
         self.pool = TestPool(self, *self.additional_params)
         self._state = WAITING_FOR_RUN
-        self._prompt = None
-        self.currently_running = None
+        self._prompt_message = None
+        self._prompt_title = None
+        self._current_job = None
         self.pause = Event()
         self._halt = Event()
         self._lock = Lock()
-        self.params = dict()
-        self.selected_tests = []
+        self.params = {}
+        self._selected_tests = []
         self.queue = []
+
+    @property
+    def selected_tests(self):
+        return self._selected_tests
+
+    @selected_tests.setter
+    def selected_tests(self, value) -> list:
+        self._selected_tests = value
+
+    @property
+    def current_job(self):
+        return self._current_job
+
+    @current_job.setter
+    def current_job(self, value):
+        eel.set_current_job(value)
+        self._current_job = value
 
     @property
     def additional_params(self):
@@ -61,11 +80,36 @@ class TestWorker(Thread):
 
     @property
     def prompt(self):
-        return self._prompt
+        return {"title": self._prompt_title, "message": self._prompt_message}
 
     @property
     def state(self):
         return self._state
+
+    @state.setter
+    def state(self, value):
+        eel.set_state(value)
+        self._state = value
+
+    def set_param(self, key, value):
+        '''
+        Sets a parameter for the worker.
+
+        :param key: The key of the parameter.
+        :type key: str
+        :param value: The value of the parameter.
+        :type value: str
+        '''
+        self.params[key] = value
+
+    def raise_prompt(self, title, msg):
+        self.pause.set()
+        eel.prompt(title, msg)
+        self.state = PENDING_USER_INPUT
+        log.debug("Prompt returned: {}".format(msg))
+        self._prompt_title = title
+        self._prompt_message = msg
+        self._wait_for_response()
 
     def _get_prefix(self):
         '''
@@ -106,37 +150,22 @@ class TestWorker(Thread):
         '''
         # called when all tests are finished running
         self.pause.set()
-        self._state = DONE
+        self.state = DONE
 
         if False in report.values():
-            self._prompt = 'fail'
+            self.raise_prompt('Fail!', "Done!")
         else:
-            self._prompt = 'pass'
+            self.raise_prompt('Pass', "Done!")
 
         self._save_report(report)
-        self._wait_for_unpause()
-        self._state = WAITING_FOR_RUN
-        self.currently_running = None
+        self.state = WAITING_FOR_RUN
+        self.current_job = None
         self.pause.clear()
         self._halt.clear()
         log.debug('"Restarting" thread')
         super().__init__(name='TestWorker')
         if self._lock.locked():
             self._lock.release()
-
-    def set_prompt(self, message):
-        '''
-        Pop up a prompt with the given message.
-        :param message: The message to display in the prompt.
-        :type message: str
-
-        :return: True if the user clicked OK, False if the user clicked Cancel.
-        :rtype: bool
-        '''
-        self.pause.set()
-        self._state = PENDING_USER_INPUT
-        self._prompt = message
-        return self._wait_for_response()
 
     def stop(self):
         '''
@@ -145,7 +174,7 @@ class TestWorker(Thread):
         self.pause.clear()
         self._halt.set()
         self._lock.acquire()
-        self.currently_running = None
+        self.current_job = None
 
     def answer_prompt(self, response):
         '''
@@ -153,14 +182,19 @@ class TestWorker(Thread):
         :param response: The response to the prompt.
         :type response: str
         '''
+        log.debug("Answering prompt with: {}".format(response))
         assert response in [
             OK, CANCEL], f"Gotten response other than '{OK}' or '{CANCEL}'"
         if response == OK:
+            self.state = RUNNING_TEST
+            self._prompt_message = None
+            self._prompt_title = None
+            eel.prompt(None, None)
             self.pause.clear()
-            self._state = RUNNING_TEST
-            self._prompt = None
+            log.debug("Prompt cleared")
         else:
-            self._prompt = None
+            self._prompt_message = None
+            self._prompt_title = None
             self._halt.set()
             self.pause.clear()
 
@@ -202,7 +236,7 @@ class TestWorker(Thread):
         log.debug(f"Running test: {test._name}")
         params = self._purge_kwargs(test.required_params)
         try:
-            self.currently_running = test._name
+            self.current_job = test._name
 
             # Stop running if halt flag is True
             if self._halt.is_set():
@@ -213,6 +247,7 @@ class TestWorker(Thread):
             log.info(
                 f"Test: {test._name}\t Status:{'Pass' if result else 'Fail'}")
 
+            self.current_job = None
             return result
 
         except Exception as exc:
@@ -221,7 +256,7 @@ class TestWorker(Thread):
             log.error(exc_str)
             print(traceback.format_exc())
 
-            self.set_prompt(exc_str)
+            self.raise_prompt("Error!", exc_str)
             return False
 
     def _save_report(self, report: dict):
@@ -257,7 +292,25 @@ class TestWorker(Thread):
                     status = "Did not run"
                 file.write(f"{name}:\t{status}\n")
 
-    def start(self, tests: list = None, parameters: dict = None) -> None:
+    def add_to_queue(self, test_name):
+        '''
+        Add a test to the selection.
+        :param test_name: The test name to add.
+        :type test_name: str
+        '''
+        if test_name not in self.selected_tests:
+            self.selected_tests.append(test_name)
+
+    def remove_from_queue(self, test_name):
+        '''
+        Remove a test from the selection.
+        :param test_name: The test name to remove.
+        :type test_name: str
+        '''
+        if test_name in self.selected_tests:
+            self.selected_tests.remove(test_name)
+
+    def start(self) -> None:
         '''
         Start the worker thread.
         :param tests: The tests to run.
@@ -266,17 +319,21 @@ class TestWorker(Thread):
         :param parameters: The parameters to run the tests with.
         :type parameters: dict
         '''
-        self.selected_tests = tests.copy()
-        self._state = RUNNING_TEST
-        if parameters is None or tests is None:
-            self._state = WAITING_FOR_RUN
+        self.state = RUNNING_TEST
+        if self.params is None:
+            self.state = WAITING_FOR_RUN
             raise AttributeError(
                 "Missing attribute when starting test worker thread")
 
-        given_params = set(parameters.keys())
+        if self.selected_tests == []:
+            self.state = WAITING_FOR_RUN
+            raise AttributeError(
+                "No tests selected")
+
+        given_params = set(self.params.keys())
         required_params = set(self.additional_params)
         # Get required params for tests.
-        for name in tests:
+        for name in self.selected_tests:
             required_params = required_params.union(
                 self.pool.get_test_from_name(name).required_params
             )
@@ -284,10 +341,9 @@ class TestWorker(Thread):
         # Checks whether we have enough kwargs to run all tests
         if not given_params.issuperset(required_params):
             missing = required_params.difference(given_params)
-            self._state = WAITING_FOR_RUN
+            self.state = WAITING_FOR_RUN
             raise AttributeError(f"Missing parameters to run tests: {missing}")
-        self.params = parameters
-        self.queue = tests
+        self.queue = self.selected_tests.copy()
 
         super().start()
 

@@ -10,7 +10,8 @@ class Monitor:
         Replace all text in monitor to "text".
         :param text: The text to replace the monitor text with.
         '''
-        eel.set_text(text)
+        self.text = str(text)
+        eel.set_monitor_text(self.text)
 
     def write(self, text):
         '''
@@ -18,11 +19,11 @@ class Monitor:
         :param text: The text to add to the monitor.
         '''
         self.text += str(text)
-        eel.set_text(self.text)
+        eel.set_monitor_text(self.text)
 
     def flush(self):
         '''
         Clear the monitor.
         '''
         self.text = ""
-        eel.set_text(self.text)
+        eel.set_monitor_text(self.text)
