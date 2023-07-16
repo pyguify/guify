@@ -13,13 +13,11 @@ export default function WorkerStatus({
 }) {
   const answerOk = () => {
     window.eel.answer_prompt('ok')(() => {
-      console.log('answered prompt')
       setPrompt(null)
     })
   }
   const answerCancel = () => {
     window.eel.answer_prompt('cancel')(() => {
-      console.log('answered prompt')
       setPrompt(null)
     })
   }

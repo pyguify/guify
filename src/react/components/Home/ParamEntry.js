@@ -9,7 +9,7 @@ export default function ParamEntry({ workerState, name, paramValues }) {
   }, [paramValues])
 
   const onChange = (e) => {
-    window.eel.set_param(name, e.target.value)(console.log)
+    window.eel.set_param(name, e.target.value)()
   }
 
   const toTitleCase = (str) => {

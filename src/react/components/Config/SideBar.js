@@ -5,7 +5,6 @@ import ConfigPane from './ConfigPane'
 export default function SideBar({ config, updateConfig, setConfig }) {
   const [defaultTab, setDefaultTab] = useState(null)
   useEffect(() => {
-    console.log('test')
     if (config) {
       setDefaultTab(Object.keys(config)[0])
     }
