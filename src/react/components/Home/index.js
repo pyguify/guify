@@ -4,7 +4,6 @@ import TestList from './TestList'
 import ParamList from './ParamList'
 import Monitor from './Monitor'
 import WorkerStatus from './WorkerStatus'
-import { eel } from '../../App'
 
 export default function HomeTab() {
   const workerStates = useMemo(() => {
@@ -27,16 +26,16 @@ export default function HomeTab() {
     setPromptText(msg)
   }
 
-  eel.expose(setWorkerState, 'set_state')
-  eel.expose(setCurrentJob, 'set_current_job')
-  eel.expose(setPrompt, 'prompt')
-  eel.expose(setQueue, 'set_queue')
+  window.eel.expose(setWorkerState, 'set_state')
+  window.eel.expose(setCurrentJob, 'set_current_job')
+  window.eel.expose(setPrompt, 'prompt')
+  window.eel.expose(setQueue, 'set_queue')
 
   useEffect(() => {
-    eel.get_state()(setWorkerState)
-    eel.get_current_job()(setCurrentJob)
-    eel.get_queue()(setQueue)
-    eel.get_prompt()(setPrompt)
+    window.eel.get_state()(setWorkerState)
+    window.eel.get_current_job()(setCurrentJob)
+    window.eel.get_queue()(setQueue)
+    window.eel.get_prompt()(setPrompt)
   }, [])
 
   const handleClose = () => setError(null)
@@ -67,9 +66,9 @@ export default function HomeTab() {
     const params = getParams()
     const tests = getTests()
 
-    eel.run_tests(
+    window.eel.run_tests(
       tests,
-      params,
+      params
     )(function (result) {
       if (result.error) {
         setError(result.error)

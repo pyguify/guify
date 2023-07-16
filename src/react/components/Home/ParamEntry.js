@@ -1,7 +1,5 @@
 import Form from 'react-bootstrap/Form'
-import Container from 'react-bootstrap/Container'
-import { useEffect, useMemo, useState } from 'react'
-const eel = window.eel
+import { useEffect, useState } from 'react'
 
 export default function ParamEntry({ workerState, name, paramValues }) {
   const [value, setValue] = useState(paramValues[name])
@@ -11,13 +9,13 @@ export default function ParamEntry({ workerState, name, paramValues }) {
   }, [paramValues])
 
   const onChange = (e) => {
-    eel.set_param(name, e.target.value)(console.log)
+    window.eel.set_param(name, e.target.value)(console.log)
   }
 
   const toTitleCase = (str) => {
     return str.replace(
       /\w\S*/g,
-      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
+      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
     )
   }
 

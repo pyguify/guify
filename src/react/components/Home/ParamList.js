@@ -2,15 +2,14 @@ import Form from 'react-bootstrap/Form'
 import Container from 'react-bootstrap/Container'
 import { useEffect, useMemo, useState } from 'react'
 import ParamEntry from './ParamEntry'
-const eel = window.eel
 export default function ParamList({ workerState }) {
   const [params, setParams] = useState([])
   const [paramValues, setParamValues] = useState({})
 
-  eel.expose(setParamValues, 'update_params')
+  window.eel.expose(setParamValues, 'update_params')
 
   useEffect(() => {
-    eel.get_params()((p) => {
+    window.eel.get_params()((p) => {
       setParams(Object.keys(p))
       setParamValues(p)
     })
