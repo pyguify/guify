@@ -66,7 +66,7 @@ app = GUIfy()
 @app.register(priority=0) # priority is optional, 0 will run before 1
 def some_test(name):
     print("Prompting user")
-    app.prompt_user(f"Hello {name}!")
+    app.prompt_user('HI!', f"Hello {name}!")
     print(f"Hello {name}")
 ```
 
@@ -80,7 +80,7 @@ app = GUIfy()
 @app.register(priority=0) # priority is optional, 0 will run before 1
 def some_test(name):
     print("Prompting user")
-    app.prompt_user(f"Hello {name}!")
+    app.prompt_user('HI!', f"Hello {name}!")
     print(f"Hello {name}")
 
 app.run()
@@ -117,9 +117,9 @@ def test_1(example_arg):
     # print function will also print to the monitor
     print('This is a test2\n')
 
-    # app.prompt_user(prompt) - pops up a modal in the gui and asks user to click OK or cancel.
+    # app.prompt_user(title, prompt) - pops up a modal in the gui and asks user to click OK or cancel.
     # app.prompt_user will return True if user clicked OK and False if user clicked cancel
-    result = app.prompt_user('This is a prompt') # True if user clicked OK, False if user clicked Cancel
+    result = app.prompt_user('This is the title', 'This is a prompt') # result = True if user clicked OK, False if user clicked Cancel
 
     # app.config get something from config tab, acts similar to configparser
     # config stored in config.ini in the current working directory.
