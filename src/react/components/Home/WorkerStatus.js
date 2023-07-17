@@ -12,14 +12,10 @@ export default function WorkerStatus({
   setPrompt,
 }) {
   const answerOk = () => {
-    window.eel.answer_prompt('ok')(() => {
-      setPrompt(null)
-    })
+    window.eel.answer_prompt('ok')()
   }
   const answerCancel = () => {
-    window.eel.answer_prompt('cancel')(() => {
-      setPrompt(null)
-    })
+    window.eel.answer_prompt('cancel')()
   }
 
   const statusVariant = () => {
@@ -39,7 +35,11 @@ export default function WorkerStatus({
 
   return (
     <>
-      <Modal show={promptText} backdrop="static" keyboard={false}>
+      <Modal
+        show={workerState === 'pending'}
+        backdrop="static"
+        keyboard={false}
+      >
         <Modal.Header>
           <Modal.Title>{promptTitle}</Modal.Title>
         </Modal.Header>
