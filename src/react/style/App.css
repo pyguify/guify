@@ -1,11 +1,13 @@
-#layout {
-  padding-bottom: 20px;
-}
 #monitor-text {
-  margin-left: 10px;
   margin-top: 10px;
   min-height: calc(100vh - 100px);
   width: 100%;
+  height: calc(100vh - 70px);
+}
+
+#monitor {
+  margin: 0;
+  max-width: 100%;
 }
 #run-tests-button {
   margin-left: 10px;
@@ -80,6 +82,13 @@ input[type='checkbox'] {
   margin: auto;
   margin-top: 30px;
   width: 80%;
+}
+
+#test-list-container {
+  max-height: calc(100vh - 60px);
+  width: 50vw;
+  max-width: 600px;
+  min-width: 350px;
 }
 
 .running.list-group-item {

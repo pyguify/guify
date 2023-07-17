@@ -9,13 +9,13 @@ app = guify.GUIfy()
 # app.monitor.append_text('hello world\n') // appends text to the text area
 # app.monitor.set_text('hello world\n') // sets the text area to 'hello world'
 # app.monitor.flush() // clears the text area
-# app.prompt_user('prompt') -> (True if OK, False if CANCEL)
+# app.prompt_user('title', 'prompt') -> (True if OK, False if CANCEL)
 
 
 @app.register(priority=1, name="test 1", description="test1")
 def test1(test_arg):
     print("Running test1\n")
-    print(str(app.prompt_user(test_arg)) + "\n")
+    print(str(app.prompt_user('test_arg:', test_arg)) + "\n")
 
     return True
 

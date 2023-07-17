@@ -1,9 +1,7 @@
-import React, { useEffect } from 'react'
-import { useState, useMemo } from 'react'
+import React from 'react'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
-import { eel } from '../../App'
 
 export default function WorkerStatus({
   workerState,
@@ -14,16 +12,10 @@ export default function WorkerStatus({
   setPrompt,
 }) {
   const answerOk = () => {
-    eel.answer_prompt('ok')(() => {
-      console.log('answered prompt')
-      setPrompt(null)
-    })
+    window.eel.answer_prompt('ok')()
   }
   const answerCancel = () => {
-    eel.answer_prompt('cancel')(() => {
-      console.log('answered prompt')
-      setPrompt(null)
-    })
+    window.eel.answer_prompt('cancel')()
   }
 
   const statusVariant = () => {
@@ -43,7 +35,11 @@ export default function WorkerStatus({
 
   return (
     <>
-      <Modal show={promptText} backdrop="static" keyboard={false}>
+      <Modal
+        show={workerState === 'pending'}
+        backdrop="static"
+        keyboard={false}
+      >
         <Modal.Header>
           <Modal.Title>{promptTitle}</Modal.Title>
         </Modal.Header>

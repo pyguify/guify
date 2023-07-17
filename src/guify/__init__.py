@@ -1,8 +1,9 @@
 import sys
+
 if sys.stdout is None or sys.stderr is None:
     # When running built app (and using --noconsole) stdout and stderr are not
     # available. This is a workaround to make sure that errors are logged.
-    sys.stdout = sys.stderr = open(os.path.join(os.getcwd(), 'log.txt'), 'w')
+    sys.stdout = sys.stderr = open(os.path.join(os.getcwd(), "log.txt"), "w")
 
 from .constants import OK, CANCEL
 from .TestWorker import WAITING_FOR_RUN, PENDING_USER_INPUT, DONE
@@ -12,10 +13,10 @@ from .constants import OK, CANCEL, WAITING_FOR_RUN, PENDING_USER_INPUT, DONE
 from .App import worker, GUIfy
 import logging
 
-'''
+"""
 Author github: @MikeyDN
 Author: Michael Druyan
-'''
+"""
 
 log = logging.getLogger("guify.__init__")
 
@@ -44,7 +45,7 @@ def run_tests(tests, params):
             return {
                 "state": worker.state,
                 "currentJob": worker.current_job,
-                "prompt": worker.prompt
+                "prompt": worker.prompt,
             }
 
 
@@ -64,8 +65,9 @@ def all_tests():
                 "name": test._name,
                 "requiredParams": test.required_params,
                 "description": test.description,
-                "verbose_name": test.name
-            } for test in worker.pool
+                "verbose_name": test.name,
+            }
+            for test in worker.pool
         ]
     }
     return retval
@@ -73,31 +75,31 @@ def all_tests():
 
 @eel.expose
 def get_state():
-    '''
+    """
     The function that gets called from the GUI to get the current state of the
     worker.
 
     :return: A dictionary containing the current state of the worker.
     :rtype: { workerState: str }
-    '''
+    """
     return worker.state
 
 
 @eel.expose
 def get_current_job():
-    '''
+    """
     The function that gets called from the GUI to get the current job of the
     worker.
 
     :return: A dictionary containing the current job of the worker.
     :rtype: { currentJob: str }
-    '''
+    """
     return worker.current_job
 
 
 @eel.expose
 def set_param(key, value):
-    '''
+    """
     The function that gets called from the GUI to set a parameter for the
     worker.
 
@@ -107,7 +109,7 @@ def set_param(key, value):
     :type value: str
     :return: A dictionary containing the current state of the worker.
     :rtype: {status: {state: str, currentJob: str, prompt: str}}
-    '''
+    """
     log.debug(f"set_param called with key: {key}, value: {value}")
     if worker.state == WAITING_FOR_RUN:
         worker.set_param(key, value)
@@ -119,37 +121,37 @@ def set_param(key, value):
 
 @eel.expose
 def get_params():
-    '''
+    """
     The function that gets called from the GUI to get the current parameters of
     the worker.
 
     :return: A dictionary containing the current parameters of the worker.
     :rtype: dict
-    '''
+    """
     return worker.params
 
 
 @eel.expose
 def get_prompt():
-    '''
+    """
     The function that gets called from the GUI to get the current prompt of the
     worker.
 
-    :return: A dictionary containing the current prompt of the worker.
-    :rtype: { title: str, 'message': str }
-    '''
+    :return: A tuple containing the current prompt of the worker.
+    :rtype: (title, message)
+    """
     return worker.prompt
 
 
 @eel.expose
 def get_queue():
-    '''
+    """
     The function that gets called from the GUI to get the current queue of the
     worker.
 
     :return: A dictionary containing the current queue of the worker.
     :rtype: { queue: [str] }
-    '''
+    """
     return worker.selected_tests
 
 
@@ -202,7 +204,7 @@ def answer_prompt(response):
                 "status": {
                     "state": worker.state,
                     "currentJob": worker.current_job,
-                    "prompt": worker.prompt
+                    "prompt": worker.prompt,
                 }
             }
         else:
@@ -230,7 +232,7 @@ def get_config():
     :rtype: {config: dict}
     """
     log.debug(f"get_config called")
-    return {'config': worker.config_tab.load()}
+    return {"config": worker.config_tab.load()}
 
 
 @eel.expose
@@ -246,7 +248,7 @@ def save_config(config: dict):
 
     log.debug(f"save_config called with config: {config}")
     worker.config_tab.save(config)
-    return {'config': worker.config_tab.load()}
+    return {"config": worker.config_tab.load()}
 
 
 @eel.expose
@@ -277,5 +279,6 @@ def remove_from_queue(tests: list[str]):
     log.debug(f"remove_from_queue called with tests: {tests}")
     worker.remove_from_queue(tests)
     eel.set_queue(worker.selected_tests)
+
 
 ### End eel functions ###

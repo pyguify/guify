@@ -2,8 +2,6 @@ import React from 'react'
 import ListGroup from 'react-bootstrap/ListGroup'
 import { useState, useEffect } from 'react'
 import Form from 'react-bootstrap/Form'
-import Container from 'react-bootstrap/Container'
-import { eel } from '../../App'
 
 export default function TestSection({
   workerState,
@@ -23,9 +21,9 @@ export default function TestSection({
     event.preventDefault()
     const { name, checked } = event.target
     if (checked) {
-      eel.add_to_queue(name)()
+      window.eel.add_to_queue(name)()
     } else {
-      eel.remove_from_queue(name)()
+      window.eel.remove_from_queue(name)()
     }
   }
 
