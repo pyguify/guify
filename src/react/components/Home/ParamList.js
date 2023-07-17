@@ -10,7 +10,8 @@ export default function ParamList({ workerState }) {
 
   useEffect(() => {
     window.eel.get_params()((p) => {
-      setParams(Object.keys(p))
+      let newParams = Object.keys(p)
+      setParams(newParams.sort())
       setParamValues(p)
     })
   }, [])
