@@ -10,9 +10,7 @@ export default function Layout() {
   return (
     <div id="layout">
       <Tabs defaultActiveKey="home">
-      
-        <Tab eventKey="home" title="Home">
-        
+        <Tab eventKey="home" title="Home" style={{ maxHeight: "calc(100vh - 60px)"}}>
           <HomeTab />
         </Tab>
         <Tab eventKey="config" title="Config" style={{flexDirection: "column"}}>
@@ -21,7 +19,6 @@ export default function Layout() {
         <Tab eventKey="about" title="About">
           <AboutTab />
         </Tab>
-        
       </Tabs>
     </div>
   ) // prettier-ignore

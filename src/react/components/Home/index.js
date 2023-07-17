@@ -89,10 +89,7 @@ export default function HomeTab() {
           </Button>
         </Modal.Footer>
       </Modal>
-      <Container
-        className="flex-column"
-        style={{ maxHeight: 'calc(100vh-80px)' }}
-      >
+      <Container className="flex-column" id="test-list-container">
         <TestList
           id="test-list"
           workerState={workerState}
@@ -112,7 +109,7 @@ export default function HomeTab() {
           Run Tests
         </Button>
       </Container>
-      <Container className="flex-column">
+      <Container className="flex-column" style={{ maxWidth: '100%' }}>
         <Monitor />
       </Container>
     </>
