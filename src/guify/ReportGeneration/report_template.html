@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <style>
+      :root {
+        font-family: Tahoma;
+      }
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid #000;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Guify Report</h1>
+    </header>
+    <report>
+      <table>
+        <tr>
+          <th>Test Name</th>
+          <th>Status</th>
+        </tr>
+        {% for name, status in tests.items() %}
+        <tr>
+          <td>{{ name }}</td>
+          {% if status == None %}
+          <td class="did-not-run">Did not run</td>
+          {% elif status == True %}
+          <td class="pass">Pass</td>
+          {% else %}
+          <td class="fail">Fail</td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </table>
+    </report>
+  </body>
+</html>

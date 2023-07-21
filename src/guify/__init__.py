@@ -10,8 +10,9 @@ from .TestWorker import WAITING_FOR_RUN, PENDING_USER_INPUT, DONE
 import os
 import eel
 from .constants import OK, CANCEL, WAITING_FOR_RUN, PENDING_USER_INPUT, DONE
-from .App import worker, GUIfy
 import logging
+from .App import GUIfy, worker
+from configparser import ConfigParser
 
 """
 Author github: @MikeyDN
@@ -279,6 +280,37 @@ def remove_from_queue(tests: list[str]):
     log.debug(f"remove_from_queue called with tests: {tests}")
     worker.remove_from_queue(tests)
     eel.set_queue(worker.selected_tests)
+
+
+@eel.expose
+def get_settings():
+    """
+    The function that gets called from the GUI to get the current settings of the
+    worker.
+
+    :return: A dictionary containing the current settings of the worker.
+    :rtype: dict
+    """
+    cfg = ConfigParser()
+    cfg.read(os.path.join(os.getcwd(), 'settings.ini'))
+    return cfg._sections
+
+
+@eel.expose
+def set_settings(settings: dict):
+    """
+    The function that gets called from the GUI to set the current settings of the
+    worker.
+
+    :return: A dictionary containing the current settings of the worker.
+    :rtype: dict
+    """
+    cfg = ConfigParser()
+    cfg.read_dict(settings)
+    with open(os.path.join(os.getcwd(), 'settings.ini'), 'w') as f:
+        cfg.write(f)
+    eel.update_param_list(list(worker.pool.required_params))
+    return cfg._sections
 
 
 ### End eel functions ###

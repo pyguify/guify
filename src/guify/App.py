@@ -1,11 +1,11 @@
-from .TestWorker import TestWorker
-from .BaseTest import BaseTest
 import os
 import logging
 import platform
 import sys
 import eel
 from pymsgbox import alert
+from .TestWorker import TestWorker
+from configparser import ConfigParser
 
 log = logging.getLogger("\tindex.py")
 worker = TestWorker()
@@ -19,7 +19,7 @@ class GUIfy:
     # that is required by registered functions. For example:
     # if a registered function requires argument name and age
     # then report_prefix can be set to 'name' or 'age'.
-    def __init__(self, app_name='GUIfy', port=8080, report_dir=None, report_prefix=None, redirect_stdout=True):
+    def __init__(self, app_name='GUIfy', port=8080, redirect_stdout=True):
         """
         Initialize the GUIfy object.
 
@@ -41,14 +41,22 @@ class GUIfy:
         self._port = port
         self._app_name = app_name
         eel.expose(self.app_name)
-        worker._report_dir = report_dir
-        worker._report_prefix = report_prefix
         self.worker = worker
         self.monitor = self.worker.monitor
         self.config = self.worker.config_tab
 
         if redirect_stdout:
             sys.stdout = self.monitor
+
+    def _get_eel_kwargs_from_dict(self, kwargs: dict):
+        dirname = os.path.dirname(os.path.abspath(__file__))
+        directory = kwargs.get('directory', os.path.join(dirname, 'web'))
+        debug = kwargs.get('debug', False)
+        app = kwargs.get('app', 'chrome')
+        port = kwargs.get('port', self._port)
+        page = kwargs.get('page', 'index.html')
+        app_mode = kwargs.get('app_mode', True)
+        return directory, debug, app, port, page, app_mode
 
     def app_name(self):
         """
@@ -105,16 +113,6 @@ class GUIfy:
         :raises: ValueError if seconds is not an integer.
         """
         eel.sleep(seconds)
-
-    def _get_eel_kwargs_from_dict(self, kwargs: dict):
-        dirname = os.path.dirname(os.path.abspath(__file__))
-        directory = kwargs.get('directory', os.path.join(dirname, 'web'))
-        debug = kwargs.get('debug', False)
-        app = kwargs.get('app', 'chrome')
-        port = kwargs.get('port', self._port)
-        page = kwargs.get('page', 'index.html')
-        app_mode = kwargs.get('app_mode', True)
-        return directory, debug, app, port, page, app_mode
 
     def run(self, host='localhost', _eel_kwargs: dict = {}):
         """
