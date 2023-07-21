@@ -21,6 +21,7 @@ Author: Michael Druyan
 
 log = logging.getLogger("guify.__init__")
 
+
 ### Start eel functions ###
 
 
@@ -292,6 +293,7 @@ def get_settings():
     :rtype: dict
     """
     cfg = ConfigParser()
+
     cfg.read(os.path.join(os.getcwd(), 'settings.ini'))
     return cfg._sections
 

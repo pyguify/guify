@@ -81,6 +81,14 @@ class TestWorker(Thread):
 
         :rtype: list
         """
+
+        SETTINGS_FILE = os.path.join(os.getcwd(), 'settings.ini')
+        if not os.path.exists(SETTINGS_FILE):
+            cfg = ConfigParser()
+            cfg.read_dict(
+                {'reports': {'reports_dir': '', 'report_prefix': ''}})
+            with open(SETTINGS_FILE, 'w') as f:
+                cfg.write(f)
         report_prefix = self._get_settings("report_prefix")
         if len(report_prefix.strip()) > 0:
             return [report_prefix,]
@@ -174,9 +182,9 @@ class TestWorker(Thread):
         self.state = DONE
 
         if False in report.values():
-            self.raise_prompt("Fail!", "Done!")
+            self.raise_prompt("Oops", "Some tests have failed.")
         else:
-            self.raise_prompt("Pass", "Done!")
+            self.raise_prompt("Done!", "All tests passed!")
 
         self._save_report(report)
         self.state = WAITING_FOR_RUN
@@ -185,8 +193,6 @@ class TestWorker(Thread):
         self._halt.clear()
         log.debug('"Restarting" thread')
         super().__init__(name="TestWorker")
-        if self._lock.locked():
-            self._lock.release()
 
     def stop(self):
         """
@@ -292,6 +298,8 @@ class TestWorker(Thread):
         reports_path = self._get_settings("reports_dir")
         if reports_path is None:
             return
+        if not os.path.exists(reports_path):
+            os.mkdir(reports_path)
 
         def get_filepath(i=1):
             # returns the file path for the report
@@ -306,8 +314,8 @@ class TestWorker(Thread):
 
         with open(get_filepath(), 'w') as f:
             template = Template(
-                open(os.path.join(os.path.dirname(__file__), 'ReportGeneration', 'report_template.html')).read())
-            f.write(template.render(tests=report))
+                open(os.path.join(os.path.dirname(__file__), 'report_template.html')).read())
+            f.write(template.render(tests=report, params=self.params))
 
         # with open(get_filepath(), "x") as file:
         #     file.write("Test name\tStatus\n")
@@ -379,7 +387,7 @@ class TestWorker(Thread):
         Returns an initial report with all tests set to None.
         :rtype: dict
         """
-        return {key: None for key in self.queue}
+        return {self.pool.get_test_from_name(test)._verbose_name: None for test in self.pool.order}
 
     def run(self):
         """
@@ -397,7 +405,7 @@ class TestWorker(Thread):
                 self.queue.remove(test._name)
                 status = self._run_test(test)
 
-                report[test._name] = status
+                report[test._verbose_name] = status
                 if status is False:
                     self.stop()
                     break
