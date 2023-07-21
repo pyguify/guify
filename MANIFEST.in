@@ -1,3 +1,4 @@
 include src/guify/web/*
 include src/guify/web/*/*
 include src/guify/web/*/*/*
+include src/guify/report_template.html

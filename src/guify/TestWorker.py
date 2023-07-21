@@ -1,5 +1,5 @@
 import os.path
-from pathlib import Path
+from jinja2 import Template
 from configparser import ConfigParser
 from eel import sleep
 from .TestPool import TestPool
@@ -26,20 +26,23 @@ log = logging.getLogger("\tTestWorker")
 
 
 class TestWorker(Thread):
+    '''
+    The TestWorker class is responsible for running the tests.
+
+    '''
     _instance = None
     monitor = Monitor()
     config_tab = ConfigTab()
 
-    def __new__(cls, *args, **kwargs):
-        if not isinstance(cls._instance, cls):
-            cls._instance = object.__new__(cls, *args, **kwargs)  # type: ignore
-        return cls._instance
+    # def __new__(cls, *args, **kwargs):
+    #     if not isinstance(cls._instance, cls):
+    #         cls._instance = object.__new__(
+    #             cls, *args, **kwargs)  # type: ignore
+    #     return cls._instance
 
-    def __init__(self, report_dir=None, report_prefix=None):
+    def __init__(self):
         super().__init__(name="TestWorker")
-        self._report_prefix = report_prefix
-        self._report_dir = report_dir
-        self.pool = TestPool(self, *self.additional_params)
+        self.pool = TestPool(self, self.additional_params)
         self._state = WAITING_FOR_RUN
         self._prompt_message = None
         self._prompt_title = None
@@ -68,7 +71,6 @@ class TestWorker(Thread):
         eel.set_current_job(value)
         self._current_job = value
 
-    @property
     def additional_params(self):
         """
         Returns a list of additional parameters that are required
@@ -79,8 +81,17 @@ class TestWorker(Thread):
 
         :rtype: list
         """
-        if self._report_prefix is not None:
-            return [self._report_prefix,]
+
+        SETTINGS_FILE = os.path.join(os.getcwd(), 'settings.ini')
+        if not os.path.exists(SETTINGS_FILE):
+            cfg = ConfigParser()
+            cfg.read_dict(
+                {'reports': {'reports_dir': '', 'report_prefix': ''}})
+            with open(SETTINGS_FILE, 'w') as f:
+                cfg.write(f)
+        report_prefix = self._get_settings("report_prefix")
+        if len(report_prefix.strip()) > 0:
+            return [report_prefix,]
         else:
             return []
 
@@ -96,6 +107,16 @@ class TestWorker(Thread):
     def state(self, value):
         eel.set_state(value)
         self._state = value
+
+    def _get_settings(self, setting):
+        """
+        Return the directory of the reports.
+        :return: The directory of the reports.
+        :rtype: str
+        """
+        cfg = ConfigParser()
+        cfg.read(os.path.join(os.getcwd(), 'settings.ini'))
+        return cfg.get('reports', setting)
 
     def set_param(self, key, value):
         """
@@ -121,7 +142,8 @@ class TestWorker(Thread):
         """
         Returns the prefix for the report name.
         """
-        return self.params[self._report_prefix] if self._report_prefix else "report"
+        report_prefix = self._get_settings("report_prefix")
+        return self.params[report_prefix] if len(report_prefix.strip()) > 0 else "report"
 
     def _create_report_folder(self, report_dir):
         """
@@ -136,14 +158,15 @@ class TestWorker(Thread):
         """
         Returns the path to the reports folder.
         """
-        if self._report_dir is None:
+        report_dir = self._get_settings("reports_dir")
+        if report_dir is None:
             log.debug("No report directory set, report generation is off")
             return None
 
-        if os.path.isabs(self._report_dir):
-            retval = self._report_dir
+        if os.path.isabs(report_dir):
+            retval = report_dir
         else:
-            retval = os.path.join(os.getcwd(), self._report_dir)
+            retval = os.path.join(os.getcwd(), report_dir)
 
         self._create_report_folder(retval)
         return retval
@@ -159,9 +182,9 @@ class TestWorker(Thread):
         self.state = DONE
 
         if False in report.values():
-            self.raise_prompt("Fail!", "Done!")
+            self.raise_prompt("Oops", "Some tests have failed.")
         else:
-            self.raise_prompt("Pass", "Done!")
+            self.raise_prompt("Done!", "All tests passed!")
 
         self._save_report(report)
         self.state = WAITING_FOR_RUN
@@ -170,8 +193,6 @@ class TestWorker(Thread):
         self._halt.clear()
         log.debug('"Restarting" thread')
         super().__init__(name="TestWorker")
-        if self._lock.locked():
-            self._lock.release()
 
     def stop(self):
         """
@@ -252,7 +273,8 @@ class TestWorker(Thread):
 
             result = test.run(**params)
 
-            log.info(f"Test: {test._name}\t Status:{'Pass' if result else 'Fail'}")
+            log.info(
+                f"Test: {test._name}\t Status:{'Pass' if result else 'Fail'}")
 
             self.current_job = None
             return result
@@ -271,32 +293,40 @@ class TestWorker(Thread):
         :param report: The report to save.
         :type report: dict
         """
+
         log.debug("Saving report")
-        reports_path = self._get_reports_path()
+        reports_path = self._get_settings("reports_dir")
         if reports_path is None:
             return
+        if not os.path.exists(reports_path):
+            os.mkdir(reports_path)
 
         def get_filepath(i=1):
             # returns the file path for the report
             # if the file already exists, adds a number to the end of the filename
             # e.g. report.txt -> report_1.txt -> report_2.txt
-            filename = f"{self._get_prefix()}_{i}.txt"
+            filename = f"{self._get_prefix()}_{i}.html"
             filepath = os.path.join(reports_path, filename)
             if os.path.isfile(filepath):
                 return get_filepath(i + 1)
             else:
                 return filepath
 
-        with open(get_filepath(), "x") as file:
-            file.write("Test name\tStatus\n")
-            for name, status in report.items():
-                if status is True:
-                    status = "Pass"
-                elif status is False:
-                    status = "Fail"
-                else:  # if status is None
-                    status = "Did not run"
-                file.write(f"{name}:\t{status}\n")
+        with open(get_filepath(), 'w') as f:
+            template = Template(
+                open(os.path.join(os.path.dirname(__file__), 'report_template.html')).read())
+            f.write(template.render(tests=report, params=self.params))
+
+        # with open(get_filepath(), "x") as file:
+        #     file.write("Test name\tStatus\n")
+        #     for name, status in report.items():
+        #         if status is True:
+        #             status = "Pass"
+        #         elif status is False:
+        #             status = "Fail"
+        #         else:  # if status is None
+        #             status = "Did not run"
+        #         file.write(f"{name}:\t{status}\n")
 
     def add_to_queue(self, test_name):
         """
@@ -328,14 +358,15 @@ class TestWorker(Thread):
         self.state = RUNNING_TEST
         if self.params is None:
             self.state = WAITING_FOR_RUN
-            raise AttributeError("Missing attribute when starting test worker thread")
+            raise AttributeError(
+                "Missing attribute when starting test worker thread")
 
         if self.selected_tests == []:
             self.state = WAITING_FOR_RUN
             raise AttributeError("No tests selected")
 
         given_params = set(self.params.keys())
-        required_params = set(self.additional_params)
+        required_params = set(self.additional_params())
         # Get required params for tests.
         for name in self.selected_tests:
             required_params = required_params.union(
@@ -356,7 +387,7 @@ class TestWorker(Thread):
         Returns an initial report with all tests set to None.
         :rtype: dict
         """
-        return {key: None for key in self.queue}
+        return {self.pool.get_test_from_name(test)._verbose_name: None for test in self.pool.order}
 
     def run(self):
         """
@@ -374,7 +405,7 @@ class TestWorker(Thread):
                 self.queue.remove(test._name)
                 status = self._run_test(test)
 
-                report[test._name] = status
+                report[test._verbose_name] = status
                 if status is False:
                     self.stop()
                     break

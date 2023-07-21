@@ -30,6 +30,10 @@
   cursor: pointer;
 }
 
+report-filename {
+  display: flex;
+}
+
 input[type='checkbox'] {
   cursor: pointer;
 }
@@ -89,6 +93,12 @@ input[type='checkbox'] {
   width: 50vw;
   max-width: 600px;
   min-width: 350px;
+}
+
+#cursor-questionmark {
+  display: inline;
+  height: 20px;
+  width: 20px;
 }
 
 .running.list-group-item {
