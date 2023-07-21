@@ -317,17 +317,6 @@ class TestWorker(Thread):
                 open(os.path.join(os.path.dirname(__file__), 'report_template.html')).read())
             f.write(template.render(tests=report, params=self.params))
 
-        # with open(get_filepath(), "x") as file:
-        #     file.write("Test name\tStatus\n")
-        #     for name, status in report.items():
-        #         if status is True:
-        #             status = "Pass"
-        #         elif status is False:
-        #             status = "Fail"
-        #         else:  # if status is None
-        #             status = "Did not run"
-        #         file.write(f"{name}:\t{status}\n")
-
     def add_to_queue(self, test_name):
         """
         Add a test to the selection.
