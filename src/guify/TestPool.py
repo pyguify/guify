@@ -11,7 +11,7 @@ log = logging.getLogger('TestPool')
 
 
 class TestPool:
-    def __init__(self, worker, *additional_params):
+    def __init__(self, worker, additional_params):
         # additional_params is any other params that
         # might be required (not by the tests)
         self.additional_params = additional_params
@@ -37,7 +37,7 @@ class TestPool:
         Returns a set of all the required parameters for all the tests.
         :rtype: set
         '''
-        return_value = set(self.additional_params)
+        return_value = set(self.additional_params())
         for cls in self:
             return_value = return_value.union(cls.required_params)
         return return_value

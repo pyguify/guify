@@ -8,10 +8,16 @@ export default function ParamList({ workerState }) {
 
   window.eel.expose(setParamValues, 'update_params')
 
+  const updateParams = (params) => {
+    setParams(params.sort())
+  }
+  window.eel.expose(updateParams, 'update_param_list')
+
   useEffect(() => {
+    window.eel.all_params()(({ params }) => {
+      setParams(params.sort())
+    })
     window.eel.get_params()((p) => {
-      let newParams = Object.keys(p)
-      setParams(newParams.sort())
       setParamValues(p)
     })
   }, [])

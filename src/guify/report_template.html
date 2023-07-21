@@ -1,0 +1,79 @@
+<html>
+  <!-- This is the template for the report. -->
+  <!-- There are 2 parameters passed to the template: -->
+  <!-- 1. params: A dictionary of parameters passed to the test suite. -->
+  <!-- 2. tests: A dictionary of test names (verbose name) and their status. -->
+  <head>
+    <style>
+      :root {
+        font-family: Tahoma;
+      }
+      tbody {
+        padding: 0;
+        margin: 0;
+      }
+      th {
+        background-color: #64b9e4;
+      }
+      tr:nth-child(even) {
+        background-color: #9cf0ff6c;
+      }
+      tr:nth-child(odd) {
+        background-color: #9cf0ff99;
+      }
+      th,
+      td {
+        padding: 10px;
+      }
+      .pass {
+        background-color: #6bcd5f;
+      }
+      .fail {
+        background-color: #ff8e8e;
+      }
+      .did-not-run {
+        background-color: #d2d260;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Guify Report</h1>
+    </header>
+    <params>
+      <table>
+        <tr>
+          <th>Parameter</th>
+          <th>Value</th>
+        </tr>
+        {% for param, value in params.items() %}
+        <tr>
+          <td>{{ param }}</td>
+          <td>{{ value }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </params>
+    <br />
+    <report>
+      <table>
+        <tr>
+          <th>Test Name</th>
+          <th>Status</th>
+        </tr>
+        {% for name, status in tests.items() %}
+        <tr>
+          <td>{{ name }}</td>
+          {% if status == None %}
+          <td class="did-not-run">Did not run</td>
+          {% elif status == True %}
+          <td class="pass">Pass</td>
+          {% else %}
+          <td class="fail">Fail</td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </table>
+    </report>
+  </body>
+</html>

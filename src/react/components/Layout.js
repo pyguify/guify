@@ -5,6 +5,7 @@ import HomeTab from './Home'
 import WorkerStatus from './Home/WorkerStatus'
 import AboutTab from './About'
 import ConfigTab from './Config'
+import SettingsTab from './Settings'
 
 export default function Layout() {
   return (
@@ -15,6 +16,9 @@ export default function Layout() {
         </Tab>
         <Tab eventKey="config" title="Config" style={{flexDirection: "column"}}>
           <ConfigTab />
+        </Tab>
+        <Tab eventKey="settings" title="Settings">
+          <SettingsTab />
         </Tab>
         <Tab eventKey="about" title="About">
           <AboutTab />
