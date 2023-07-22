@@ -113,6 +113,26 @@ input[type='checkbox'] {
   animation: errorBlinker 2s ease-in-out infinite;
 }
 
+.data-pair {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.config-section-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.config-section-link {
+  width: 90%;
+  float: right;
+}
+
 @keyframes successBlinker {
   0% {
     background-color: #dcecffcc;

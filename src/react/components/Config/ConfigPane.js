@@ -1,33 +1,34 @@
-import Form from 'react-bootstrap/Form'
-import InputGroup from 'react-bootstrap/InputGroup'
-import Tab from 'react-bootstrap/Tab'
 import React, { useEffect, useState } from 'react'
+import { Button, Modal } from 'react-bootstrap'
+import DataPair from './DataPair'
 
-export default function ConfigPane({ configSection, handleChange }) {
+export default function ConfigPane({ eventKey, config, setError }) {
+  const [configSection, setConfigSection] = useState(null)
+
+  const sectionName = eventKey
+
+  useEffect(() => {
+    setConfigSection(config[sectionName])
+  }, [config])
+
+  const newRow = () => {
+    window.eel.config_insert_row(sectionName)
+  }
+
   return (
     <>
       {configSection &&
         Object.entries(configSection).map(([key, value]) => (
-          <InputGroup
-            className="mb-3"
-            key={key}
-            style={{ width: '40vw', maxWidth: 800, minWidth: 400 }}
-          >
-            <InputGroup.Text
-              id={key}
-              style={{ width: '50%', justifyContent: 'center' }}
-            >
-              {key}
-            </InputGroup.Text>
-            <Form.Control
-              type="text"
-              aria-label={key}
-              aria-describedby={key}
-              defaultValue={value}
-              onChange={(e) => handleChange(key, e.target.value)}
-            />
-          </InputGroup>
+          <DataPair
+            defaultKey={key}
+            defaultValue={value}
+            sectionName={sectionName}
+            setError={setError}
+          />
         ))}
+      <Button variant="primary" onClick={(e) => newRow()}>
+        +
+      </Button>
     </>
   )
 }
