@@ -18,8 +18,8 @@ app = guify.GUIfy()
 def test1(test_arg):
     print("Running test1\n")
     app.config.insert('example', 'foo', 'bar')
-    print(str(app.prompt_user('test_arg:', test_arg)) + "\n")
-    app.prompt_user('example.foo', app.config.get('example', 'foo'))
+    print(str(app.prompt_user('test_arg:', test_arg)))
+    print(app.config.get_section('example'))
     app.config.delete('example', 'foo')
     return True
 
