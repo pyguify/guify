@@ -5,7 +5,10 @@ import './style/bootstrap/bootstrap-grid.min.css'
 import './style/bootstrap/bootstrap-reboot.min.css'
 import './style/App.css'
 export const eel = window.eel
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
 
+library.add(fas)
 const App = () => {
   return <Layout />
 }

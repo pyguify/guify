@@ -296,7 +296,7 @@ class TestWorker(Thread):
 
         log.debug("Saving report")
         reports_path = self._get_settings("reports_dir")
-        if reports_path is None:
+        if reports_path == '' or len(reports_path.strip()) == 0:
             return
         if not os.path.exists(reports_path):
             os.mkdir(reports_path)
