@@ -6,7 +6,7 @@ export default function AboutTab() {
       <Card.Body>
         <Card.Text>
           This is a simple framework for writing sequence tests in python <br />
-          Tests are defined in python under test_scripts directory
+          Tests are defined using @app.register decorator
           <br />
           Tests are run in a separate process
           <br />
