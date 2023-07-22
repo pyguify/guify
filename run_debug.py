@@ -31,7 +31,7 @@ def test1(test_arg):
     print("Running test!")
     print(str(app.prompt_user('test_arg:', test_arg)) + "\n")
     print(app.config.insert('example', 'foo', 'bar'))
-    print(app.config.get('example', 'foo') + "\n")
+    app.prompt_user(app.config.get_all(), 'foo')
     app.config.delete('example', 'foo')
 
     return True
