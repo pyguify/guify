@@ -17,8 +17,10 @@ app = guify.GUIfy()
 @app.register(priority=1, name="test 1", description="test1")
 def test1(test_arg):
     print("Running test1\n")
+    app.config.insert('example', 'foo', 'bar')
     print(str(app.prompt_user('test_arg:', test_arg)) + "\n")
-
+    app.prompt_user('example.foo', app.config.get('example', 'foo'))
+    app.config.delete('example', 'foo')
     return True
 
 
