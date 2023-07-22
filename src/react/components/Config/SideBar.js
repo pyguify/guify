@@ -1,44 +1,74 @@
 import React, { useEffect, useState } from 'react'
-import { Nav, Container, Tab } from 'react-bootstrap'
+import { Nav, Container, Tab, Button } from 'react-bootstrap'
 import ConfigPane from './ConfigPane'
+import SectionNav from './SectionNav'
 
-export default function SideBar({ config, updateConfig, setConfig }) {
-  const [defaultTab, setDefaultTab] = useState(null)
+export default function SideBar({ setError }) {
+  const [config, setConfig] = useState(null)
+
+  const refreshConfig = () => {
+    window.eel.get_config()((cfg) => {
+      setConfig(cfg)
+    })
+  }
+
+  window.eel.expose(refreshConfig, 'refresh_config')
+
+  const addSection = () => {
+    window.eel.config_add_section('new_section')(() => {
+      refreshConfig()
+    })
+  }
+
   useEffect(() => {
-    if (config) {
-      setDefaultTab(Object.keys(config)[0])
-    }
-  }, [config && Object.keys(config)[0]])
+    refreshConfig()
+  }, [])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
       <Tab.Container>
         <Container id="config-sidebar" style={{ maxWidth: 400 }}>
-          <Nav variant="pills" className="flex-column" activeKey={defaultTab}>
+          <Nav
+            variant="pills"
+            className="flex-column"
+            activeKey=""
+            style={{
+              flexWrap: 'nowrap',
+              justifyContent: 'flex-start',
+              overflowY: 'scroll',
+              height: '94%',
+            }}
+          >
             {config &&
-              Object.keys(config).map((section_name) => (
-                <Nav.Item key={section_name}>
-                  <Nav.Link eventKey={section_name}>{section_name}</Nav.Link>
-                </Nav.Item>
+              Object.keys(config).map((sectionName) => (
+                <SectionNav
+                  key={sectionName}
+                  sectionName={sectionName}
+                  setError={setError}
+                />
               ))}
           </Nav>
+          <Button
+            style={{ position: 'absolute', bottom: 100 }}
+            onClick={addSection}
+          >
+            + Add Section
+          </Button>
         </Container>
         <hr />
         <Container id="config-tab-pane">
           <Tab.Content>
             {config &&
-              Object.entries(config).map(([section_name, section]) => (
+              Object.keys(config).map((sectionName) => (
                 <Tab.Pane
-                  key={section_name}
-                  eventKey={section_name}
+                  key={sectionName}
+                  eventKey={sectionName}
                   className="flex-column"
                 >
                   <ConfigPane
-                    eventKey={section_name}
-                    configSection={section}
-                    handleChange={(key, value) => {
-                      updateConfig(section_name, key, value)
-                    }}
+                    eventKey={sectionName}
+                    config={config}
+                    setError={setError}
                   />
                 </Tab.Pane>
               ))}

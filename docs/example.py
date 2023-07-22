@@ -2,9 +2,11 @@ import guify
 
 app = guify.GUIfy()
 # app:
-# app.config.get('example', 'foo') -> 'bar' (from config.ini)
-# app.config.get_section('example') -> {'foo': 'bar'} (from config.ini)
-# app.config.set('example', 'foo', 'baz') // sets foo to baz in config.ini
+# app.config.get('example', 'foo') -> 'bar'
+# app.config.get_section('example') -> {'foo': 'bar'}
+# app.config.update_key('example', 'foo', 'baz') // updates the value of the key 'foo' in the section 'example' to 'baz'
+# app.config.update_value('example', 'foo', 'baz') // sets the value of the key 'foo' in the section 'example' to 'baz'
+# full api of app.config available in homepage of guify on github
 # app.monitor // text area object in the main tab
 # app.monitor.append_text('hello world\n') // appends text to the text area
 # app.monitor.set_text('hello world\n') // sets the text area to 'hello world'

@@ -29,6 +29,10 @@ app = GUIfy("Testing GUIfy", redirect_stdout=True)
 def test1(test_arg):
     app.prompt_user("Please confirm:", "test1")
     print("Running test!")
+    print(str(app.prompt_user('test_arg:', test_arg)) + "\n")
+    print(app.config.insert('example', 'foo', 'bar'))
+    print(app.config.get('example', 'foo') + "\n")
+    app.config.delete('example', 'foo')
 
     return True
 

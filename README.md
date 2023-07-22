@@ -162,11 +162,15 @@ All configurations are stored in config.ini.
 
 ### app.config methods:
 
-- save() // Save config to config.ini
-- load() // Load config from config.ini
-- get_section() // load() and return an entire section as a dictionary
-- get(section, attribute) // load() and get value of attribute in section
-- set(section, attribute, value) // load() and set value of attribute in section and then save().
+- get(section: str, key: str) -> str // get a value of a key in section
+- get_section(section: str) -> dict\[key: str, value: str\] // get entire section as a dict
+- get_all_sections() -> list\[str\] // get a list of all section names
+- get_all() -> dict\[str, dict\[str, str\]\] // get all conifugartions
+- insert(section: str, key:str, value: str) // insert new row in database
+- update_value(section: str, key: str, value: str) // update a value of given key
+- update_key(section: str, key: str, new_key: str) // update a key in said section
+- delete(section: str, key: str) // delete row where section = section and key = key
+- delete_section(section: str) -> tuple\[bool, str\] // delete section, returns tuple of (success, msg)
 
 Assuming this is the config file:
 
