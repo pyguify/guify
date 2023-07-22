@@ -101,7 +101,7 @@ class GUIfy:
 
         :raises: ValueError if prompt is not a string.
         """
-        self.worker.raise_prompt(title, prompt)
+        self.worker.raise_prompt(str(title), str(prompt))
 
     def sleep(self, seconds: int):
         """
