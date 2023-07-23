@@ -120,7 +120,6 @@ export default function DataPair({
           }}
           size="xl"
           icon={faFloppyDisk}
-          color="#007bff"
           onClick={handleSave}
         />
       )}
