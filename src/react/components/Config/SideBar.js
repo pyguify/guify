@@ -49,7 +49,7 @@ export default function SideBar({ setError }) {
               ))}
           </Nav>
           <Button
-            style={{ position: 'absolute', bottom: 100 }}
+            style={{ position: 'absolute', bottom: 30 }}
             onClick={addSection}
           >
             + Add Section
