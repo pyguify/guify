@@ -30,13 +30,10 @@ class TestWorker:
     The TestWorker class is responsible for running the tests.
 
     """
-
-    _instance = None
     monitor = Monitor()
     config_tab = ConfigTab()
 
     def __init__(self):
-        # super().__init__(name="TestWorker")
         self.pool = TestPool(self, self.additional_params)
         self._state = WAITING_FOR_RUN
         self._prompt_message = None
@@ -44,7 +41,6 @@ class TestWorker:
         self._current_job = None
         self.pause = Event()
         self._halt = Event()
-        self._lock = Lock()
         self.params = {}
         self._selected_tests = []
         self.queue = []
@@ -192,8 +188,6 @@ class TestWorker:
         self.current_job = None
         self.pause.clear()
         self._halt.clear()
-        log.debug('"Restarting" thread')
-        # super().__init__(name="TestWorker")
 
     def stop(self):
         """
@@ -225,6 +219,7 @@ class TestWorker:
         else:
             self._prompt_message = None
             self._prompt_title = None
+            eel.prompt(None, None)
             self._halt.set()
             self.pause.clear()
 
@@ -371,7 +366,6 @@ class TestWorker:
             raise AttributeError(f"Missing parameters to run tests: {missing}")
         self.queue = self.selected_tests.copy()
         self.run()
-        # super().start()
 
     def _get_initial_report(self):
         """
