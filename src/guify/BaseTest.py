@@ -12,8 +12,9 @@ class BaseTest:
                 "_", " ")
         self.priority = priority
         self.description = description
-        self.run = func
+        self._func = func
         self._name = func.__name__
+        self.result = None
 
     @property
     def name(self):
@@ -37,3 +38,9 @@ class BaseTest:
             EXCLUDED_PARAMS)
 
         return test_params
+
+    def run(self, *args, **kwargs):
+        '''
+        Run the test.
+        '''
+        self.result = self._func(*args, **kwargs)
