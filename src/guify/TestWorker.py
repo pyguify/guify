@@ -276,7 +276,6 @@ class TestWorker(Thread):
             if self._halt.is_set():
                 return False
             result = test.run(**params)
-            result = False
             log.info(f"Test: {test._name}\t Status:{'Pass' if result else 'Fail'}")
             self.current_job = None
             return result
