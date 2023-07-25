@@ -207,6 +207,7 @@ class TestWorker(Thread):
         self._halt.set()
         self._lock.acquire()
         self.current_job = None
+        self._state = WAITING_FOR_RUN
 
     def answer_prompt(self, response):
         """
@@ -285,7 +286,7 @@ class TestWorker(Thread):
             log.error(exc_str)
             print(traceback.format_exc())
             self.current_job = None
-            self.raise_prompt(f"Error in test {test.name}", str(exc))
+            self.raise_prompt(f"Error in test {test.name}", str(exc_str))
             return False
 
     def _save_report(self, report: dict):
