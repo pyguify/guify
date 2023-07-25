@@ -50,4 +50,34 @@ def test2(test_arg2):
     return True
 
 
+@app.register()
+def test3():
+    return None
+
+
+@app.register()
+def test4():
+    return None
+
+
+@app.register()
+def test5():
+    return None
+
+
+@app.register()
+def test6():
+    return None
+
+
+@app.register()
+def test7():
+    return None
+
+
+@app.register()
+def test8():
+    return None
+
+
 app.run(_eel_kwargs=eel_kwargs if DEBUG else {})

@@ -39,3 +39,4 @@ settings.ini
 .pypirc
 test.py
 guify.egg-info
+.pytest_cache
