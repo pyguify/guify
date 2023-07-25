@@ -54,6 +54,7 @@ class TestWorker(Thread):
         self.params = {}
         self._selected_tests = []
         self.queue = []
+        self.additional_report_params = []
 
     @property
     def selected_tests(self):
@@ -275,7 +276,6 @@ class TestWorker(Thread):
             if self._halt.is_set():
                 return False
             result = test.run(**params)
-            self.raise_prompt(f"Error in test {test.name}", str(e))
             result = False
             log.info(f"Test: {test._name}\t Status:{'Pass' if result else 'Fail'}")
             self.current_job = None
@@ -286,7 +286,7 @@ class TestWorker(Thread):
             log.error(exc_str)
             print(traceback.format_exc())
             self.current_job = None
-            self.raise_prompt("Error!", exc_str)
+            self.raise_prompt(f"Error in test {test.name}", str(exc))
             return False
 
     def _save_report(self, report: dict):
