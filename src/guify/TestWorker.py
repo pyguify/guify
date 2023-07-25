@@ -25,7 +25,7 @@ DEFAULT_REPORTS_FOLDER_NAME = "reports"
 log = logging.getLogger("\tTestWorker")
 
 
-class TestWorker(Thread):
+class TestWorker:
     """
     The TestWorker class is responsible for running the tests.
 
@@ -35,14 +35,8 @@ class TestWorker(Thread):
     monitor = Monitor()
     config_tab = ConfigTab()
 
-    # def __new__(cls, *args, **kwargs):
-    #     if not isinstance(cls._instance, cls):
-    #         cls._instance = object.__new__(
-    #             cls, *args, **kwargs)  # type: ignore
-    #     return cls._instance
-
     def __init__(self):
-        super().__init__(name="TestWorker")
+        # super().__init__(name="TestWorker")
         self.pool = TestPool(self, self.additional_params)
         self._state = WAITING_FOR_RUN
         self._prompt_message = None
@@ -87,7 +81,8 @@ class TestWorker(Thread):
         SETTINGS_FILE = os.path.join(os.getcwd(), "settings.ini")
         if not os.path.exists(SETTINGS_FILE):
             cfg = ConfigParser()
-            cfg.read_dict({"reports": {"reports_dir": "", "report_prefix": ""}})
+            cfg.read_dict(
+                {"reports": {"reports_dir": "", "report_prefix": ""}})
             with open(SETTINGS_FILE, "w") as f:
                 cfg.write(f)
         report_prefix = self._get_settings("report_prefix")
@@ -147,7 +142,8 @@ class TestWorker(Thread):
         """
         report_prefix = self._get_settings("report_prefix")
         return (
-            self.params[report_prefix] if len(report_prefix.strip()) > 0 else "report"
+            self.params[report_prefix] if len(
+                report_prefix.strip()) > 0 else "report"
         )
 
     def _create_report_folder(self, report_dir):
@@ -197,7 +193,7 @@ class TestWorker(Thread):
         self.pause.clear()
         self._halt.clear()
         log.debug('"Restarting" thread')
-        super().__init__(name="TestWorker")
+        # super().__init__(name="TestWorker")
 
     def stop(self):
         """
@@ -205,7 +201,6 @@ class TestWorker(Thread):
         """
         self.pause.clear()
         self._halt.set()
-        self._lock.acquire()
         self.current_job = None
         self._state = WAITING_FOR_RUN
 
@@ -277,7 +272,8 @@ class TestWorker(Thread):
             if self._halt.is_set():
                 return False
             result = test.run(**params)
-            log.info(f"Test: {test._name}\t Status:{'Pass' if result else 'Fail'}")
+            log.info(
+                f"Test: {test._name}\t Status:{'Pass' if result else 'Fail'}")
             self.current_job = None
             return result
 
@@ -317,7 +313,8 @@ class TestWorker(Thread):
         with open(get_filepath(), "w") as f:
             template = Template(
                 open(
-                    os.path.join(os.path.dirname(__file__), "report_template.html")
+                    os.path.join(os.path.dirname(__file__),
+                                 "report_template.html")
                 ).read()
             )
             f.write(template.render(tests=report, params=self.params))
@@ -352,7 +349,8 @@ class TestWorker(Thread):
         self.state = RUNNING_TEST
         if self.params is None:
             self.state = WAITING_FOR_RUN
-            raise AttributeError("Missing attribute when starting test worker thread")
+            raise AttributeError(
+                "Missing attribute when starting test worker thread")
 
         if self.selected_tests == []:
             self.state = WAITING_FOR_RUN
@@ -372,8 +370,8 @@ class TestWorker(Thread):
             self.state = WAITING_FOR_RUN
             raise AttributeError(f"Missing parameters to run tests: {missing}")
         self.queue = self.selected_tests.copy()
-
-        super().start()
+        self.run()
+        # super().start()
 
     def _get_initial_report(self):
         """
@@ -394,6 +392,7 @@ class TestWorker(Thread):
         report = self._get_initial_report()
         log.info("Starting Worker Thread")
         for test in self.pool:
+            status = None
             if self._halt.is_set():
                 break
             # Skip this iteration if test is not meant to run
